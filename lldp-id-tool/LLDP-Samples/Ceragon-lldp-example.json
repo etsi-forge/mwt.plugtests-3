@@ -1,0 +1,94 @@
+[
+  {
+    "_index": "packets-2020-10-30",
+    "_type": "doc",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "\\Device\\NPF_{880E2CC8-4F2A-4D79-95D0-D7D61FA90727}",
+            "frame.interface_description": "2.MainBoard"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Oct 30, 2020 12:43:41.616711000 GTB Standard Time",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1604054621.616711000",
+          "frame.time_delta": "0.000000000",
+          "frame.time_delta_displayed": "0.000000000",
+          "frame.time_relative": "0.000000000",
+          "frame.number": "1",
+          "frame.len": "60",
+          "frame.cap_len": "60",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:lldp"
+        },
+        "eth": {
+          "eth.dst": "01:80:c2:00:00:0e",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "LLDP_Multicast",
+            "eth.dst.oui": "98498",
+            "eth.addr": "01:80:c2:00:00:0e",
+            "eth.addr_resolved": "LLDP_Multicast",
+            "eth.addr.oui": "98498",
+            "eth.dst.lg": "0",
+            "eth.lg": "0",
+            "eth.dst.ig": "1",
+            "eth.ig": "1"
+          },
+          "eth.src": "3c:4c:d0:54:1e:f1",
+          "eth.src_tree": {
+            "eth.src_resolved": "CeragonN_54:1e:f1",
+            "eth.src.oui": "3951824",
+            "eth.src.oui_resolved": "Ceragon Networks",
+            "eth.addr": "3c:4c:d0:54:1e:f1",
+            "eth.addr_resolved": "CeragonN_54:1e:f1",
+            "eth.addr.oui": "3951824",
+            "eth.addr.oui_resolved": "Ceragon Networks",
+            "eth.src.lg": "0",
+            "eth.lg": "0",
+            "eth.src.ig": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x000088cc",
+          "eth.padding": "00:00:00:00:00:00:00:00:00:00:00"
+        },
+        "lldp": {
+          "Chassis Subtype = MAC address, Id: 3c:4c:d0:54:1e:ee": {
+            "lldp.tlv.type": "1",
+            "lldp.tlv.len": "7",
+            "lldp.chassis.subtype": "4",
+            "lldp.chassis.id.mac": "3c:4c:d0:54:1e:ee"
+          },
+          "Port Subtype = MAC address, Id: 3c:4c:d0:54:1e:f1": {
+            "lldp.tlv.type": "2",
+            "lldp.tlv.len": "7",
+            "lldp.port.subtype": "3",
+            "lldp.port.id.mac": "3c:4c:d0:54:1e:f1"
+          },
+          "Time To Live = 120 sec": {
+            "lldp.tlv.type": "3",
+            "lldp.tlv.len": "2",
+            "lldp.time_to_live": "120"
+          },
+          "Management Address": {
+            "lldp.tlv.type": "8",
+            "lldp.tlv.len": "12",
+            "lldp.mgn.address.len": "5",
+            "lldp.mgn.address.subtype": "1",
+            "lldp.mgn.addr.ip4": "10.10.66.198",
+            "lldp.mgn.interface.subtype": "2",
+            "lldp.mgn.interface.number": "0",
+            "lldp.mgn.obj.len": "0"
+          },
+          "End of LLDPDU": {
+            "lldp.tlv.type": "0",
+            "lldp.tlv.len": "0"
+          }
+        }
+      }
+    }
+  }
+]

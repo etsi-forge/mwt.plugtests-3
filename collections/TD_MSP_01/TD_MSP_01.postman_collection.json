@@ -1,0 +1,620 @@
+{
+	"info": {
+		"_postman_id": "1e6e8f84-7d4c-4237-b95b-d8a30a05f5f3",
+		"name": "TD_MSP_01",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TD_MSP_01-Step-1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "950caa88-75b1-429b-8337-4a138ea4fc66",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "147e3943-db93-4ec9-9f62-4a1ae65c679b",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"",
+							"if (pm.info.iterationCount !== 3) {",
+							"    throw new Error('This collection MUST be run with 3 iterations; One for each domain of the tree');",
+							"}",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var tree = pm.environment.get('TD_SDN_TREE');",
+							"if (tree === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_TREE\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var treeIndex = parseInt(tree) - 1;",
+							"var companyName = settings.trees[treeIndex][pm.info.iteration];",
+							"var companySettings = settings.companies[companyName];",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-yang-library:modules-state",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-yang-library:modules-state"
+					]
+				},
+				"description": "This step checks to see if two separated requests will be used, or the creation of Bandwidth Profile and Service shoudl be done in one step only."
+			},
+			"response": []
+		},
+		{
+			"name": "TD_MSP_01-Step-2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "69916984-edd7-4032-a77f-091c037aa716",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_CIR_VALUE');",
+							"pm.environment.unset('TD_SDN_EIR_VALUE');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 409]);",
+							"    // should we check for status 409 (in case profile already exists)?",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cd9a6046-01d0-448b-babf-8bb96111eef0",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_CIR_VALUE');",
+							"pm.environment.unset('TD_SDN_EIR_VALUE');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var tree = pm.environment.get('TD_SDN_TREE');",
+							"if (tree === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_TREE\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var treeIndex = parseInt(tree) - 1;",
+							"var companyName = settings.trees[treeIndex][pm.info.iteration];",
+							"var companySettings = settings.companies[companyName];",
+							"",
+							"var mediaType = companySettings.hasOwnProperty('mediaTypeForPosts')",
+							"        ? companySettings.mediaTypeForPosts : 'application/yang-data+json';",
+							"var namespacePrefix = !companySettings.noNamespaceOnPost ? 'ietf-eth-tran-service:' : '';",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_MEDIA_TYPE', mediaType);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', settings.servicename);",
+							"pm.environment.set('TD_SDN_CIR_VALUE', settings.cir);",
+							"pm.environment.set('TD_SDN_EIR_VALUE', settings.eir);",
+							"pm.environment.set('TD_SDN_NAMESPACE_PREFIX', namespacePrefix);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"etht-svc-bandwidth-profiles\": [\n    {\n      \"bandwidth-profile-name\": \"bw_profile_{{TD_SDN_SERVICE_NAME}}\",\n      \"bandwidth-profile-type\": \"ietf-eth-tran-types:mef-10-bwp\",\n      \"CIR\": \"{{TD_SDN_CIR_VALUE}}\",\n      \"EIR\": \"{{TD_SDN_EIR_VALUE}}\",\n      \"color-aware\": true,\n      \"coupling-flag\": true\n    }\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/globals",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"globals"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TD_MSP_01-Step-3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "69916984-edd7-4032-a77f-091c037aa716",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_JSON_BODY');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 201);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cd9a6046-01d0-448b-babf-8bb96111eef0",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_JSON_BODY');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var tree = pm.environment.get('TD_SDN_TREE');",
+							"if (tree === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_TREE\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var treeIndex = parseInt(tree) - 1;",
+							"var companyName = settings.trees[treeIndex][pm.info.iteration];",
+							"var companySettings = settings.companies[companyName];",
+							"",
+							"",
+							"",
+							"var mediaType = companySettings.hasOwnProperty('mediaTypeForPosts')",
+							"        ? companySettings.mediaTypeForPosts : 'application/yang-data+json';",
+							"var namespacePrefix = !companySettings.noNamespaceOnPost ? 'ietf-eth-tran-service:' : '';",
+							"",
+							"var ethProviderId = companySettings.ethProviderId;",
+							"var ethClientId   = companySettings.ethClientId;",
+							"var ethTopologyId = companySettings.ethTopologyId;",
+							"var servicename   = settings.servicename;",
+							"",
+							"var node1      = companySettings.svc['access-port1']['access-node-id'];",
+							"var node2      = companySettings.svc['access-port2']['access-node-id'];",
+							"",
+							"var linkAggrId = companySettings.svc['access-port1'][ 'a-link-aggr-id'];",
+							"var idWestId   = companySettings.svc['access-port2'][  'i-d-link-W-id'];",
+							"var localId    = companySettings.svc['access-port2']['a-link-local-id'];",
+							"var idEastId   = companySettings.svc['access-port2'][  'i-d-link-E-id'];",
+							"",
+							"var ethtSvcInstances = [];",
+							"",
+							"var totalDomainServices;",
+							"",
+							"if (pm.info.iteration === 0) {",
+							"    // domain 1    ",
+							"    totalDomainServices = getDomain1Services();",
+							"} else if (pm.info.iteration === 1) {",
+							"    // domain 2",
+							"    totalDomainServices = getDomain2Services();",
+							"} else if (pm.info.iteration === 2) {",
+							"    // domain 3",
+							"    totalDomainServices = getDomain3Services();",
+							"}",
+							"",
+							"for(var serviceIndex = 0; serviceIndex < totalDomainServices.length; serviceIndex++) {",
+							"    var domainService = totalDomainServices[serviceIndex];",
+							"    appendServiceToJSONBody(domainService.name, domainService.adminStatus, domainService.ports);",
+							"}",
+							"",
+							"function getDomain1Services() {",
+							"    var p1 = linkAggrId;",
+							"    var p2 = idWestId;",
+							"    var p3 = localId;",
+							"    var p4 = idEastId;",
+							"    ",
+							"    var services = ",
+							"    [",
+							"        {   ",
+							"            name: 'S1-local', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p1, tagType: 's-vlan', vlanValue: '201'},",
+							"                {accessNodeId: node2, accessLtpId: p3, tagType: 'c-vlan', vlanValue: '101', bwprofile: true},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S2-local-1', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p1, tagType: 's-vlan', vlanValue: '202'},",
+							"                {accessNodeId: node2, accessLtpId: p2, tagType: 's-vlan', vlanValue: '202'},",
+							"            ]",
+							"        }, ",
+							"        {   ",
+							"            name: 'S3-local-1', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p1, tagType: 's-vlan', vlanValue: '203'},",
+							"                {accessNodeId: node2, accessLtpId: p4, tagType: 's-vlan', vlanValue: '203'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S1-inter-d-1', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p1, tagType: 's-vlan', vlanValue: '204'},",
+							"                {accessNodeId: node2, accessLtpId: p2, tagType: 's-vlan', vlanValue: '204'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S2-inter-d-1', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p1, tagType: 's-vlan', vlanValue: '205'},",
+							"                {accessNodeId: node2, accessLtpId: p2, tagType: 's-vlan', vlanValue: '205'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S3-inter-d-1', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p1, tagType: 's-vlan', vlanValue: '206'},",
+							"                {accessNodeId: node2, accessLtpId: p4, tagType: 's-vlan', vlanValue: '206'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S4-inter-d-1', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p1, tagType: 's-vlan', vlanValue: '207'},",
+							"                {accessNodeId: node2, accessLtpId: p4, tagType: 's-vlan', vlanValue: '207'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S1-leaf-2', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node2, accessLtpId: p2, tagType: 's-vlan', vlanValue: '208'},",
+							"                {accessNodeId: node2, accessLtpId: p4, tagType: 's-vlan', vlanValue: '208'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S2-leaf-2', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node2, accessLtpId: p2, tagType: 's-vlan', vlanValue: '209'},",
+							"                {accessNodeId: node2, accessLtpId: p3, tagType: 'c-vlan', vlanValue: '103', bwprofile: true},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S3-leaf-1', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node2, accessLtpId: p3, tagType: 'c-vlan', vlanValue: '104', bwprofile: true},",
+							"                {accessNodeId: node2, accessLtpId: p4, tagType: 's-vlan', vlanValue: '210'},",
+							"            ]",
+							"        }",
+							"    ]",
+							"    ",
+							"    if ('Intracom' === companyName) {",
+							"        services[8].adminStatus = 'down'; // S2-leaf-2",
+							"        services[9].adminStatus = 'down'; // S3-leaf-1",
+							"        pm.environment.set('TD_SDN_ICOM_ACTIVE_LOCAL_SERVICE', 'S1-local');",
+							"    }",
+							"    return services;",
+							"}",
+							"",
+							"function getDomain2Services() {",
+							"    var p5 = linkAggrId;",
+							"    var p6 = idWestId;",
+							"    var p7 = localId;",
+							"    var p8 = idEastId;",
+							"    ",
+							"    var services = ",
+							"    [",
+							"        {   ",
+							"            name: 'S2-local-2', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p5, tagType: 's-vlan', vlanValue: '202'},",
+							"                {accessNodeId: node2, accessLtpId: p7, tagType: 'c-vlan', vlanValue: '101', bwprofile: true},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S1-inter-d-2', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p5, tagType: 's-vlan', vlanValue: '204'},",
+							"                {accessNodeId: node2, accessLtpId: p6, tagType: 's-vlan', vlanValue: '204'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S2-inter-d-2', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p5, tagType: 's-vlan', vlanValue: '205'},",
+							"                {accessNodeId: node2, accessLtpId: p8, tagType: 's-vlan', vlanValue: '205'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S1-leaf-1', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node2, accessLtpId: p7, tagType: 'c-vlan', vlanValue: '102', bwprofile: true},",
+							"                {accessNodeId: node1, accessLtpId: p5, tagType: 's-vlan', vlanValue: '208'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S2-leaf-1', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node2, accessLtpId: p7, tagType: 'c-vlan', vlanValue: '103', bwprofile: true},",
+							"                {accessNodeId: node1, accessLtpId: p5, tagType: 's-vlan', vlanValue: '209'},",
+							"            ]",
+							"        }",
+							"    ]",
+							"    return services;",
+							"}",
+							"",
+							"function getDomain3Services() {",
+							"    var p9 = linkAggrId;",
+							"    var p10 = idWestId;",
+							"    var p11 = localId;",
+							"    var p12 = idEastId;",
+							"    ",
+							"    var services = ",
+							"    [",
+							"        {   ",
+							"            name: 'S3-local-2', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p9 , tagType: 's-vlan', vlanValue: '203'},",
+							"                {accessNodeId: node2, accessLtpId: p11, tagType: 'c-vlan', vlanValue: '101', bwprofile: true},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S3-inter-d-2', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p9 , tagType: 's-vlan', vlanValue: '206'},",
+							"                {accessNodeId: node2, accessLtpId: p10, tagType: 's-vlan', vlanValue: '206'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S4-inter-d-2', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p9 , tagType: 's-vlan', vlanValue: '207'},",
+							"                {accessNodeId: node2, accessLtpId: p12, tagType: 's-vlan', vlanValue: '207'},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S1-leaf-3', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p9 , tagType: 's-vlan', vlanValue: '208'},",
+							"                {accessNodeId: node2, accessLtpId: p11, tagType: 'c-vlan', vlanValue: '102', bwprofile: true},",
+							"            ]",
+							"        },",
+							"        {   ",
+							"            name: 'S3-leaf-2', ",
+							"            adminStatus: 'up', ",
+							"            ports: [",
+							"                {accessNodeId: node1, accessLtpId: p9 , tagType: 's-vlan', vlanValue: '210'},",
+							"                {accessNodeId: node2, accessLtpId: p11, tagType: 'c-vlan', vlanValue: '104', bwprofile: true},",
+							"            ]",
+							"        }",
+							"    ]",
+							"    return services;",
+							"}",
+							"",
+							"function appendServiceToJSONBody(ethtSvcName, adminStatus, accessPortsInfo) {",
+							"    var ethtSvcInstance = {};",
+							"    ethtSvcInstance['etht-svc-name']       = ethtSvcName;",
+							"    ethtSvcInstance['access-provider-id']  = ethProviderId;",
+							"    ethtSvcInstance['access-client-id']    = ethClientId;",
+							"    ethtSvcInstance['access-topology-id']  = ethTopologyId;",
+							"    ethtSvcInstance['etht-svc-type']       = 'ietf-eth-tran-types:p2p-svc';",
+							"    ethtSvcInstance['admin-status']        = 'ietf-te-types:tunnel-state-' + adminStatus;",
+							"    ",
+							"    var ethtSvcAccessPorts = [];",
+							"    for(var accessPortId = 0; accessPortId < accessPortsInfo.length; accessPortId++) {",
+							"        var accessPortInfo = accessPortsInfo[accessPortId];",
+							"        ",
+							"        ethtSvcAccessPort = {};",
+							"        ethtSvcAccessPort['access-port-id'] = accessPortId + 1; // should be 1 or 2.",
+							"        ethtSvcAccessPort['access-node-id'] = accessPortInfo.accessNodeId;",
+							"        ethtSvcAccessPort['access-ltp-id' ] = accessPortInfo.accessLtpId;",
+							"        ethtSvcAccessPort['service-classification-type'] = 'ietf-eth-tran-types:vlan-classification';",
+							"        ",
+							"        outerTag = {};",
+							"        outerTag['tag-type']   = 'ietf-eth-tran-types:classify-'   + accessPortInfo.tagType;",
+							"        outerTag['vlan-value'] = parseInt(accessPortInfo.vlanValue);",
+							"        ethtSvcAccessPort['outer-tag'] = outerTag;",
+							"        ",
+							"        if (accessPortInfo.hasOwnProperty('bwprofile')) {",
+							"            ethtSvcAccessPort['ingress-egress-bandwidth-profile-name'] = 'bw_profile_' + servicename;",
+							"        }",
+							"        ",
+							"        ethtSvcAccessPorts.push(ethtSvcAccessPort);",
+							"    }",
+							"    ethtSvcInstance['etht-svc-access-ports'] = ethtSvcAccessPorts;",
+							"    ",
+							"    ethtSvcInstances.push(ethtSvcInstance);",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_MEDIA_TYPE', mediaType);",
+							"pm.environment.set('TD_SDN_JSON_BODY', JSON.stringify(ethtSvcInstances));",
+							"pm.environment.set('TD_SDN_NAMESPACE_PREFIX', namespacePrefix);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"{{TD_SDN_NAMESPACE_PREFIX}}etht-svc-instances\": {{TD_SDN_JSON_BODY}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TD_MSP_01-Step-4",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3a67d68a-7eee-47e4-b380-21ea1152243d",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var tree = pm.environment.get('TD_SDN_TREE');",
+							"if (tree === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_TREE\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var treeIndex = parseInt(tree) - 1;",
+							"var companyName = settings.trees[treeIndex][pm.info.iteration];",
+							"var companySettings = settings.companies[companyName];",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ed1e2fa6-efba-45c1-bc56-246b769609b7",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-yang-library:modules-state",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-yang-library:modules-state"
+					]
+				},
+				"description": "This step functions as a final target for the collection. Step-3 will call\npostman.setNextRequest('TD_SDN_SSP_01-Step-5') to avoid the execution of Step-4."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "9fe3949f-d9e5-4875-8f2f-ad3bdc8e5e5e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "71a7d21e-625e-4f6e-8413-ef0412d13280",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

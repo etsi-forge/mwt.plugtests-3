@@ -1,0 +1,176 @@
+{
+	"info": {
+		"_postman_id": "b604fc42-4cd8-40a3-b058-a08109c61302",
+		"name": "TD_SSD_01",
+		"description": "Test Objective\t\r\nIssue a request via Postman to one individual domain controller, to check it’s reachability and basic functionality, including (tentative list – to be further analyzed):\r\n1.\tSupport of Restconf\r\n2.\tSupport of the Data Models as specified in the “ETSI mWT ISG SDN Plugtest Data Model Library” document \r\n\r\nPre-test conditions\r\n•\tThe Domain Controller instance is up and running normally\r\n•\tAll the devices are upgraded to correct versions\r\n•\tAll basic configurations are completed (e.g., NE_id, OSPF, PCEP, etc.)\r\n\r\nSee for example appendix B.1.2 of RFC8040:\r\n\r\nGET /restconf/data/ietf-yang-library:modules-state",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TD_SSD_01-Step-1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6a7f458b-603f-4be6-bf94-24fca1b094c7",
+						"exec": [
+							"// Clear environment variables",
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"",
+							"// Test 1: Check the response body of the above request and confirm if the Restconf server is serviceable.",
+							"pm.test('Response is OK', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 200);",
+							"});",
+							"",
+							"var responseJson = pm.response.json();",
+							"var moduleList = {};",
+							"",
+							"// Step 2: The response body of the request should contain a list of all YANG modules and submodules used by the Restconf server along with information about name and revision for each module.",
+							"pm.test('The response body of the request should contain a list of all YANG modules', function() {",
+							"    var topLevelPropertyName = responseJson.hasOwnProperty('modules-state')",
+							"            ? 'modules-state' : 'ietf-yang-library:modules-state';",
+							"    pm.expect(responseJson).to.have.property(topLevelPropertyName);",
+							"    responseJson[topLevelPropertyName].module.forEach(function(item, index) {",
+							"        pm.expect(item).to.have.property('name');",
+							"        pm.expect(item).to.have.property('revision');",
+							"        pm.expect(item).to.have.property('namespace');",
+							"        if (moduleList.hasOwnProperty(item.name)) {",
+							"            if (moduleList[item.name].revision < item.revision) {",
+							"                moduleList[item.name] = item;",
+							"            }",
+							"        } else {",
+							"            moduleList[item.name] = item;",
+							"        }",
+							"    });",
+							"});",
+							"",
+							"pm.test('Needed YANG modules are supported', function() {",
+							"    pm.expect(moduleList).to.have.property(\"ietf-restconf\");",
+							"    pm.expect(moduleList).to.have.property(\"ietf-yang-library\");",
+							"    pm.expect(moduleList).to.have.property(\"ietf-network\");",
+							"    pm.expect(moduleList).to.have.property(\"ietf-network-topology\");",
+							"    pm.expect(moduleList).to.have.property(\"ietf-te-topology\");",
+							"    pm.expect(moduleList).to.have.property(\"ietf-microwave-topology\");",
+							"    pm.expect(moduleList).to.have.property(\"ietf-eth-te-topology\");",
+							"    pm.expect(moduleList).to.have.property(\"ietf-eth-tran-service\");",
+							"    pm.expect(moduleList).to.have.property(\"ietf-eth-tran-types\");",
+							"});",
+							"",
+							"// TODO: Do we want to test these as well?",
+							"// ietf-te-types@2018-06-12.yang (draft-ietf-teas-yang-te-15) ",
+							"// ietf-yang-types@2013-07-15.yang (RFC6991) ",
+							"// ietf-inet-types@2013-07-15.yang (RFC6991) ",
+							"// ietf-routing-types@2017-12-04.yang (RFC8294)",
+							"// ietf-yang-schema-mount@2018-10-16.yang (draft-ietf-netmod-schema-mount-12) �C RFC Queue ",
+							"",
+							"// Step 4: The response body of each query should contain the specified YANG module along with its name and revision. See Annex D.",
+							"",
+							"pm.test('ietf-network is supported with the right version', function() {",
+							"    pm.expect(moduleList[\"ietf-network\"]).to.have.property('revision', \"2018-02-26\");",
+							"    pm.expect(moduleList[\"ietf-network\"]).to.have.property('namespace', \"urn:ietf:params:xml:ns:yang:ietf-network\");",
+							"});",
+							"",
+							"pm.test('ietf-network-topology is supported with the right version', function() {",
+							"    pm.expect(moduleList[\"ietf-network-topology\"]).to.have.property('revision', \"2018-02-26\");",
+							"    pm.expect(moduleList[\"ietf-network-topology\"]).to.have.property('namespace', \"urn:ietf:params:xml:ns:yang:ietf-network-topology\");",
+							"});",
+							"",
+							"pm.test('ietf-te-topology is supported with the right version', function() {",
+							"    pm.expect(moduleList[\"ietf-te-topology\"]).to.have.property('revision', \"2018-06-15\");",
+							"    pm.expect(moduleList[\"ietf-te-topology\"]).to.have.property('namespace', \"urn:ietf:params:xml:ns:yang:ietf-te-topology\");",
+							"});",
+							"",
+							"pm.test('ietf-microwave-topology is supported with the right version', function() {",
+							"    pm.expect(moduleList[\"ietf-microwave-topology\"]).to.have.property('revision', \"2018-10-22\");",
+							"    pm.expect(moduleList[\"ietf-microwave-topology\"]).to.have.property('namespace', \"urn:ietf:params:xml:ns:yang:ietf-microwave-topology\");",
+							"});",
+							"",
+							"pm.test('ietf-eth-te-topology is supported with the right version', function() {",
+							"    pm.expect(moduleList[\"ietf-eth-te-topology\"]).to.have.property('revision', \"2018-03-01\");",
+							"    pm.expect(moduleList[\"ietf-eth-te-topology\"]).to.have.property('namespace', \"urn:ietf:params:xml:ns:yang:ietf-eth-te-topology\");",
+							"});",
+							"",
+							"pm.test('ietf-eth-tran-service is supported with the right version', function() {",
+							"    pm.expect(moduleList[\"ietf-eth-tran-service\"]).to.have.property('revision');",
+							"    pm.expect(moduleList[\"ietf-eth-tran-service\"].revision).to.be.oneOf([\"2018-08-30\",\"2019-11-03\"])",
+							"    pm.expect(moduleList[\"ietf-eth-tran-service\"]).to.have.property('namespace', \"urn:ietf:params:xml:ns:yang:ietf-eth-tran-service\");",
+							"});",
+							"",
+							"pm.test('ietf-eth-tran-types is supported with the right version', function() {",
+							"    pm.expect(moduleList[\"ietf-eth-tran-types\"]).to.have.property('revision');",
+							"    pm.expect(moduleList[\"ietf-eth-tran-types\"].revision).to.be.oneOf([\"2018-08-30\",\"2019-11-03\"])",
+							"    pm.expect(moduleList[\"ietf-eth-tran-types\"]).to.have.property('namespace', \"urn:ietf:params:xml:ns:yang:ietf-eth-tran-types\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ee85e975-b8dc-4b04-aa4e-33a74d782258",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-yang-library:modules-state",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-yang-library:modules-state"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "6225d390-e7ff-4146-8276-1941ff36d1d1",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "05a792ce-efe1-4fae-be96-37de9f5f17ff",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -1,0 +1,606 @@
+{
+	"info": {
+		"_postman_id": "bbbbfdc6-24e6-4b25-b51d-d4f5cf2ff1ed",
+		"name": "TD_SSP_03",
+		"description": "Interoperability Test Description\r\nIdentifier\tTD_ SDN_SSP_03\r\nTest Objective\tDelete the specified L2 data service over a single domain. The traffic generator/analyzer confirms that data stops flowing.\r\nConfiguration\tCFG_03\r\nReferences\t\r\nApplicability\tMW_8040, MW_8345, MW_TETOPO, MW_MWTOPO, MW_ETHSVC\r\n\r\nPre-test conditions\t•\tThe Domain Controller instance is up and running normally\r\n•\tAll the devices are upgraded to correct versions\r\n•\tAll basic configurations are completed (e.g., NE_id, OSPF, PCEP, etc.) \r\n•\tThe Restconf server is serviceable.\r\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TD_SSP_03-Step-1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a8fe5455-924b-451a-9cb2-57c937dea261",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b74520a2-5f07-47b5-bcc7-b0370c6271f3",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', \"S1_local\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/etht-svc-instances={{TD_SDN_SERVICE_NAME}}",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"etht-svc-instances={{TD_SDN_SERVICE_NAME}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_03-Step-2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f470f784-5f8c-47ca-9d53-efa9456b2561",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b42e3707-905d-4535-82ca-5cbbd3b3bb66",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', \"S2_local\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/etht-svc-instances={{TD_SDN_SERVICE_NAME}}",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"etht-svc-instances={{TD_SDN_SERVICE_NAME}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_03-Step-3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "631ca7e8-e7c1-487a-859a-28a8cfd7f6e6",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "dc93d6dd-345b-46b8-b82b-2ad6d8ceb55d",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', \"S3_local\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/etht-svc-instances={{TD_SDN_SERVICE_NAME}}",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"etht-svc-instances={{TD_SDN_SERVICE_NAME}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_03-Step-4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7c888abb-0112-48b9-ae91-1bc27a59ee7f",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f4a7f1cb-11f3-4d6a-9d5b-3b0bc476fcbf",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', \"S1-inter-d\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/etht-svc-instances={{TD_SDN_SERVICE_NAME}}",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"etht-svc-instances={{TD_SDN_SERVICE_NAME}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_03-Step-5",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3b10f1ed-324d-400c-821c-f7cfdb8c6f73",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "33f16d16-3b10-4180-975d-c17679404d42",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', \"S2-inter-d\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/etht-svc-instances={{TD_SDN_SERVICE_NAME}}",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"etht-svc-instances={{TD_SDN_SERVICE_NAME}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_03-Step-6",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c8f384b7-03fc-46f2-8fbc-1b90d359f1c0",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cd03931f-81e8-44e4-9761-96dc362b511d",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', \"S1-leaf2\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/etht-svc-instances={{TD_SDN_SERVICE_NAME}}",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"etht-svc-instances={{TD_SDN_SERVICE_NAME}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_03-Step-7",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8b41a88c-d6fa-49ee-aaac-8bc9f88e5e04",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3924eef9-ebcc-4c8f-9549-aa79ee5d478a",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', \"S2-leaf2\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/etht-svc-instances={{TD_SDN_SERVICE_NAME}}",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"etht-svc-instances={{TD_SDN_SERVICE_NAME}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_03-Step-8",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9034f902-5bb8-4e65-a59e-8115ae2da301",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', settings.servicename);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e3be7e72-2c74-42c7-ab38-008741abbee3",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response.code).to.be.oneOf([204,404]) ;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/globals/etht-svc-bandwidth-profiles=bw_profile_{{TD_SDN_SERVICE_NAME}}",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"globals",
+						"etht-svc-bandwidth-profiles=bw_profile_{{TD_SDN_SERVICE_NAME}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "8a8f1987-d7cb-458a-b1c7-732d32103e0c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "b35a17f3-b8f7-4288-b24e-c7003a93274a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

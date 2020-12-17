@@ -1,0 +1,271 @@
+{
+	"info": {
+		"_postman_id": "5d43cfff-d5a5-45b2-8a83-4ad95e207d0c",
+		"name": "TD_LLDP_01",
+		"description": "The inter-domain-plug-id value associated to the port used to capture the LLDP packets in TD_SDD_04 is requested from the two DCs under test.\r\n\r\nFor each DC, this value is compared to the reference value calculated by the reference algorithm, available on the local http server, based on the given couple of DCs under test.\r\n\r\nEach DC is hereby tested for compliance with the reference algorithm.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TD_LLDP_01-Step-1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "22b07fb9-4e9b-4583-8686-87471d68cf81",
+						"exec": [
+							"pm.test('Response is OK', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 200);",
+							"});",
+							"",
+							"var response = pm.response.json();",
+							"",
+							"pm.test(\"Validation of response body\", function() {",
+							"    pm.expect(response).to.have.property('domain1');",
+							"    pm.expect(response).to.have.property('domain2');",
+							"    pm.expect(response).to.have.property('plug-id');",
+							"    pm.expect(response['plug-id']).to.have.property('hex');",
+							"    pm.expect(response['plug-id']).to.have.property('base64');",
+							"    ",
+							"    pm.environment.unset(\"TD_SDN_INTER_DOMAIN_PLUG_ID\");",
+							"    pm.environment.set(\"TD_SDN_INTER_DOMAIN_PLUG_ID\", response[\"plug-id\"][\"base64\"]);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d03bc08e-83ca-49c9-86fd-8e357594b805",
+						"exec": [
+							"pm.environment.unset(\"TD_SDN_COMPANY_1\");",
+							"pm.environment.unset(\"TD_SDN_COMPANY_2\");",
+							"//pm.environment.unset(\"TD_SDN_WEB_SERVER_URL\");",
+							"pm.environment.unset(\"TD_SDN_INTER_DOMAIN_PLUG_ID\");",
+							"pm.environment.unset(\"TD_SDN_RESTCONF_PATH\");",
+							"pm.environment.unset(\"TD_SDN_ETH_TOPOLOGY_PATH_SUFFIX\");",
+							"//pm.environment.unset(\"TD_LLDP_TEST\");",
+							"//pm.environment.unset(\"TD_LLDP_TEST_PAIR\");",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var webServerUrl = pm.environment.get('TD_SDN_WEB_SERVER_URL');",
+							"if (webServerUrl === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_WEB_SERVER_URL\" is undefined');",
+							"}",
+							"",
+							"var lldpTest = pm.environment.get('TD_LLDP_TEST');",
+							"if (lldpTest === undefined) {",
+							"    throw new Error('Environment variable \"TD_LLDP_TEST\" is undefined');",
+							"}",
+							"",
+							"var pair = pm.environment.get('TD_LLDP_TEST_PAIR');",
+							"if (lldpTest === undefined) {",
+							"    throw new Error('Environment variable \"TD_LLDP_TEST_PAIR\" is undefined');",
+							"}",
+							"",
+							"var companiesUnderTest = settings.lldptests[parseInt(lldpTest) - 1][parseInt(pair) - 1];",
+							"var company1 = settings.indeces[companiesUnderTest[0]];",
+							"var company2 = settings.indeces[companiesUnderTest[1]];",
+							"",
+							"pm.environment.set('TD_SDN_COMPANY_1', company1);",
+							"pm.environment.set('TD_SDN_COMPANY_2', company2);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{TD_SDN_WEB_SERVER_URL}}/plugid?domain1={{TD_SDN_COMPANY_1}}.json&domain2={{TD_SDN_COMPANY_2}}.json",
+					"host": [
+						"{{TD_SDN_WEB_SERVER_URL}}"
+					],
+					"path": [
+						"plugid"
+					],
+					"query": [
+						{
+							"key": "domain1",
+							"value": "{{TD_SDN_COMPANY_1}}.json"
+						},
+						{
+							"key": "domain2",
+							"value": "{{TD_SDN_COMPANY_2}}.json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TD_LLDP_01-Step-2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3c07c75c-b940-403f-bd66-6145c498e77d",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_ETH_TOPOLOGY_PATH_SUFFIX');",
+							"",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"",
+							"pm.test(companyName + ': Response is OK', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 200);",
+							"});",
+							"",
+							"var companySettings = settings.companies[companyName];",
+							"var companyEthernetNetworkId = companySettings.ethNetworkId;",
+							"var interDomainNodeId = companySettings.svc['access-port-lldp']['access-node-id'];",
+							"var interDomainTpId = companySettings.svc['access-port-lldp']['link-lldp-id'];",
+							"",
+							"var response = pm.response.json();",
+							"",
+							"function getInterDomainPlugId() {",
+							"    var topLevelPropertyName = response.hasOwnProperty('networks') ? 'networks' : 'ietf-network:networks';",
+							"    ",
+							"    // test the existence of the ethernet network",
+							"    var networks = response[topLevelPropertyName][\"network\"];",
+							"    var network;",
+							"    for(var net in networks)  {",
+							"        if(networks[net][\"network-id\"] === companyEthernetNetworkId) {",
+							"            network = networks[net];",
+							"            break;",
+							"        }",
+							"    }",
+							"    pm.test(companyName + ': Ethernet Network: ' + companyEthernetNetworkId + 'is present', function() {",
+							"        pm.expect(network).to.not.be.null;",
+							"    });",
+							"",
+							"    // test the existence of the node",
+							"    var nodes = network[\"node\"];",
+							"    var node;",
+							"    for(var nodeId in nodes) {",
+							"        if(nodes[nodeId][\"node-id\"] === interDomainNodeId) {",
+							"            node = nodeId;",
+							"            break;",
+							"        }",
+							"    }",
+							"    pm.test(companyName + ': Node:  ' +  interDomainNodeId +  ' is present', function() {",
+							"        pm.expect(node).to.not.be.null;",
+							"    });",
+							"",
+							"    // test the existence of the termination point",
+							"    var networkInterfaces = nodes[node][\"ietf-network-topology:termination-point\"];",
+							"    var interDomainInterface;",
+							"    for(var networkIf in networkInterfaces) {",
+							"        if(networkInterfaces[networkIf][\"ietf-te-topology:te-tp-id\"] === interDomainTpId) {",
+							"            interDomainInterface = networkIf;",
+							"            break;",
+							"        }",
+							"    }",
+							"    pm.test(companyName + ': Termination Point:  ' +  interDomainInterface +  ' is present', function() {",
+							"        pm.expect(node).to.not.be.null;",
+							"    });",
+							"",
+							"    var interDomainPlugId = networkInterfaces[interDomainInterface][\"ietf-te-topology:te\"][\"inter-domain-plug-id\"];",
+							"    return interDomainPlugId;",
+							"}",
+							"",
+							"var interDomainPlugId = getInterDomainPlugId();",
+							"var calculatedInterDomainPlugId = pm.environment.get('TD_SDN_INTER_DOMAIN_PLUG_ID');",
+							"",
+							"pm.test(companyName + ': Inter-domain plug id is present', function() {",
+							"        pm.expect(interDomainPlugId).to.not.be.null;",
+							"});",
+							"",
+							"pm.test(companyName + ': The two inter-domain-plug-ids are equal', function(){",
+							"    pm.expect(interDomainPlugId).to.equal(calculatedInterDomainPlugId);",
+							"})",
+							"",
+							"pm.environment.unset(\"TD_SDN_COMPANY_1\");",
+							"pm.environment.unset(\"TD_SDN_COMPANY_2\");",
+							"//pm.environment.unset(\"TD_SDN_WEB_SERVER_URL\");",
+							"pm.environment.unset(\"TD_SDN_INTER_DOMAIN_PLUG_ID\");",
+							"pm.environment.unset(\"TD_SDN_RESTCONF_PATH\");",
+							"pm.environment.unset(\"TD_SDN_ETH_TOPOLOGY_PATH_SUFFIX\");",
+							"pm.environment.unset(\"TD_LLDP_TEST\");",
+							"pm.environment.unset(\"TD_LLDP_TEST_PAIR\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1a1347df-db10-4aab-946d-afcdfa77edda",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_ETH_TOPOLOGY_PATH_SUFFIX');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"var pathSuffix;",
+							"if (!companySettings.allNetworks) {",
+							"    // We will retrieve the ethernet topology only",
+							"    pathSuffix = 'ietf-network:networks/network=' + encodeURIComponent(companySettings.ethNetworkId);",
+							"} else {",
+							"    // assuming that we have to get all networks",
+							"    console.log('We are going to get all networks');",
+							"    // check if \"TD_SDN_SNSD_02-Step-1\" has already be run'",
+							"    if (!companySettings.mwNetworkId) {",
+							"        throw new Error('Property \"mwNetworkId\" is unknown. Please run \"TD_SDN_SNSD_02-Step-1\" first');",
+							"    }",
+							"    pathSuffix = 'ietf-network:networks';",
+							"}",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_ETH_TOPOLOGY_PATH_SUFFIX', pathSuffix);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/{{TD_SDN_ETH_TOPOLOGY_PATH_SUFFIX}}",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"{{TD_SDN_ETH_TOPOLOGY_PATH_SUFFIX}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

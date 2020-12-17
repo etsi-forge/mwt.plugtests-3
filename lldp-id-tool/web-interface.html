@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+
+<!-- 
+Released under BSD 3-Clause
+Author: Michele Carignani, ETSI CTI, cti_support@etsi.org
+-->
+<head>
+	<meta charset="UTF-8">
+	<title>mWT Plugtests - LLDP plug-id calculator</title>
+<style>
+
+pre.data {
+	background-color: #EFEFEF;
+	margin: 10px;
+	border: 1px solid #dee2e6;
+	width: 100%;
+	min-height: 40px;
+	padding: 5px;
+}
+</style>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</head>
+
+<body class="container">
+
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+	  <div class="container">
+
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="https://www.etsi.org/events/plugtests">
+	        <img alt="LLDP plug-ids calculation" src="static/logo.jpg" style="height:45px">
+	      </a>
+	    </div>
+
+	    <form class="form-inline my-2 my-lg-0" action="upload" method="post" enctype="multipart/form-data">
+      		Upload a JSON sample packet:    
+      		<input class="" type="file" name="filetoupload">
+      		<button class="btn btn-info" type="submit">Upload</button>
+    	</form>
+     <button class="btn btn-danger" onclick="delete_dm1()" style="margin-left:-200px;" data-toggle="tooltip" data-placement="right" title="Delete the file selected as Domain 1">Delete</button>
+
+	  </div>
+	</nav>
+
+
+	<div class="container" style="margin-top:25px">
+		<p>Select the domains for which you want to calculate the LLDP Plug-id, then click the blue button.</p>
+			
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">Domain 1:</label>
+				<div class="col-sm-10">
+					<select id="select-dm1" class="form-control">
+	  					<option></option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">Domain 2:</label>
+				<div class="col-sm-10">
+					<select id="select-dm2" class="form-control">
+  						<option></option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group row" style="margin: 25px">
+    			<div class="col text-center">
+					<button id="Go" class="btn btn-primary" onclick="load_packets()">Calculate Plug ID</button>
+    			</div>
+  			</div>
+
+		</div>
+	</div>
+
+	<div class="alert alert-info text-center" role="alert" id="res_box"><span id="res"></span></div>
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-9">
+			<b>Base 64</b>
+			<pre id="plug_id_data_base64" class="data"> </pre>
+			</div>
+      
+			<div class="col-3">
+			<button id="b64-cmp" class="btn btn-link" onclick="cmp('#b64-local', '#plug_id_data_base64')">Compare</button>
+			<input id="b64-local" class="form-control" type="text" placeholder="Paste here to compare" />
+			</div>
+
+		</div>
+		<div class="row">
+      <div class="col-9">
+			<b>HEX</b>
+			<pre id="plug_id_data_hex" class="data"> </pre>
+			</div>
+      
+      <div class="col-3">
+			<button id="hex-cmp" class="btn btn-link" onclick="cmp('#hex-local', '#plug_id_data_hex')">Compare</button>
+			<input id="hex-local" class="form-control" type="text" placeholder="Paste here to compare" />
+			</div>
+      
+		</div>
+		<div class="row">
+      <div class="col">
+			<b>Domain 1 packet details</b>
+			<pre id="plug_id_data_domain1" class="data"></pre>
+      </div>
+		</div>
+		<div class="row">
+      <div class="col">	
+			<b>Domain 2 packet details</b>
+			<pre id="plug_id_data_domain2" class="data"></pre>
+      </div>
+		</div>
+	</div>
+
+  <!-- Modal -->
+<div class="modal fade" id="missingFileModal" tabindex="-1" role="dialog" aria-labelledby="missingFileModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">No file selected</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Select a file to delete in the Domain 1 selector.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="missingFileModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirm deletion</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+	      Are you sure you want to delete file <b><span id="delete_fn"></span></b>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="applyDelete()">Confirm</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteSuccessModal" tabindex="-1" role="dialog" aria-labelledby="deleteSuccessModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Deleted</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+	      The file has been delete successfully.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+
+<script>
+
+function load_packets(){
+	console.log("Loading domains data");
+	var a = document.getElementById("select-dm1").value;
+	if(a === ""){
+		message("Warning: domain 1 is empty.", "warning"); return;
+	}
+
+	var b = document.getElementById("select-dm2").value;
+	if (b === ""){
+		message("Warning: domain 2 is empty.", "warning");	return;
+	}
+
+	var url = window.location+"plugid?domain1="+a+"&domain2="+b;
+
+	messageHTML('<a href="'+url+'">'+url+"</a>");
+	get_plug_id(url);
+}
+
+function newOption(txt){
+	var elm = document.createElement('option');
+	elm.innerText = txt;
+	return elm;
+}
+
+function update_file_list(data) {
+	var reg = /[a-zA-Z\_\-0-9\.]*\.json/g;
+	var ss = data.matchAll(reg);
+
+	var res = "";
+	var j = 0;
+	while(!ss.next().done && j < 100) {
+		var a = ss.next().value[0];
+		j = j + 1;
+		document.getElementById("select-dm1").append(
+			newOption(a)
+		);
+		document.getElementById("select-dm2").append(
+			newOption(a)
+		);
+	}
+}
+
+function inject_data(a,b){
+	document.getElementById(a).innerText = b;
+}
+
+function load_plug_id_info(data) {
+	
+	var obj = JSON.parse(data);
+	inject_data("plug_id_data_base64", obj["plug-id"].base64);
+	inject_data("plug_id_data_hex", obj["plug-id"].hex);
+	inject_data("plug_id_data_domain1", JSON.stringify(obj["domain1"]));
+	console.log(obj["domain1"]);
+	inject_data("plug_id_data_domain2", JSON.stringify(obj["domain2"]));
+	console.log(obj["domain2"]);
+}
+
+function get_plug_id(url) {
+	var xhr = new XMLHttpRequest();
+	
+	xhr.onreadystatechange = function () {
+		if (xhr.readyState === 4) {
+			load_plug_id_info(xhr.response)
+		}
+	}
+
+	xhr.open('GET', url);
+	xhr.send();
+}
+
+function load_files() {
+	var xhr = new XMLHttpRequest();
+	
+	xhr.onreadystatechange = function () {
+		if (xhr.readyState === 4) {
+			update_file_list(xhr.response)
+		}
+	}
+
+	xhr.open('GET', '/packets/');
+	xhr.send();
+}
+
+function message(txt, lvl) {
+	var resbox = document.getElementById('res');
+ 	if (lvl) { resbox.class = "alert alert-"+lvl; }
+ 	resbox.innerText = txt;
+}
+
+function messageHTML(txt, lvl) {
+	var resbox = document.getElementById('res');
+ 	resbox.innerHTML = txt;
+}
+
+function go() {
+  var resbox = document.getElementById('res');
+  
+  var rx1 = document.getElementById('rx1').value;
+  var rx2 = document.getElementById('rx2').value;
+  var rx3 = document.getElementById('rx3').value;
+  var rx4 = document.getElementById('rx4').value;
+
+  var tx1 = document.getElementById('tx1').value;
+  var tx2 = document.getElementById('tx2').value;
+  var tx3 = document.getElementById('tx3').value;
+  var tx4 = document.getElementById('tx4').value;
+
+  resString = "";  
+
+  try {
+  	var RX = LldpLink(rx1,rx2,rx3,rx4); 
+  	var TX = LldpLink(tx1,tx2,tx3,tx4);
+  	console.log(RX, TX);
+  	var r = plug_ids_cmp(RX, TX);
+  	console.log(r);
+
+  	switch (r) {
+  		case 1: resString = "A = RX, B = TX"; break;
+  		case -1: resString = "A = TX, B = RX"; break;
+  		case 0: resString = "RX and TX are equal"; break;
+  	}
+  } catch (e) {
+  	resString = e;
+  }
+
+  resbox.innerText = resString;
+}
+
+function cmp(el1_id, el2_id) {
+	var el1 = document.querySelector(el1_id); 
+	var el2 = document.querySelector(el2_id); 
+
+	if (el1.value == "") {
+		el1.style.backgroundColor = "white";
+		return;
+	}
+
+	if (el1.value.trim() == el2.textContent.trim()) {
+		el1.style.backgroundColor = "#C0FFA0";
+	} else {
+		el1.style.backgroundColor = "#FFA0A0";
+	}
+}
+
+function delete_dm1() {
+
+ console.log("Hi");
+  var sEl = document.querySelector("#select-dm1");
+  
+  if (sEl.value == "") { 
+     $('#missingFileModal').modal("toggle");
+     return; 
+  }
+  // var res = confirm("Do you want to delete file "+sEl.value+ "?");
+  $('#delete_fn').text(sEl.value);
+  $('#confirmDeleteModal').modal("toggle");
+}
+
+function applyDelete() {
+  var fn = document.querySelector("#select-dm1").value;
+  $('#confirmDeleteModal').modal("toggle");
+  $.ajax({
+    url: '/upload?fn='+fn,
+    type: 'DELETE',
+    success: function(result) {
+        $('#deleteSuccessModal').modal("toggle");
+     }
+  });
+
+}
+
+load_files();
+
+
+</script>
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "lldp-id-tool",
+  "version": "1.0.0",
+  "description": "LLDP tools used for ETSI mWT SDN Plugtests - www.etsi.org",
+  "main": "web-server.js",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "btoa": "^1.2.1",
+    "formidable": "^1.2.1",
+    "node-tlv": "^1.5.11",
+    "sanitize-filename": "^1.6.3"
+  },
+  "devDependencies": {
+    "http-server": "^0.12.1",
+    "mocha": "^7.0.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://forge.etsi.org/rep/sdn/mwt/plugtests-3"
+  },
+  "author": "Michele Carignani - ETSI CTI (cti_support@etsi.org)",
+  "license": "BSD-3-Clause"
+}

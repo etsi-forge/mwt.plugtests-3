@@ -1,0 +1,148 @@
+{
+	"info": {
+		"_postman_id": "9f01049f-da81-402f-8cae-b5ed1d44bb4d",
+		"name": "TD_MSP_03",
+		"description": "Interoperability Test Description\r\nIdentifier\tTD_ SDN_SSP_03\r\nTest Objective\tDelete the specified L2 data service over a single domain. The traffic generator/analyzer confirms that data stops flowing.\r\nConfiguration\tCFG_03\r\nReferences\t\r\nApplicability\tMW_8040, MW_8345, MW_TETOPO, MW_MWTOPO, MW_ETHSVC\r\n\r\nPre-test conditions\t•\tThe Domain Controller instance is up and running normally\r\n•\tAll the devices are upgraded to correct versions\r\n•\tAll basic configurations are completed (e.g., NE_id, OSPF, PCEP, etc.) \r\n•\tThe Restconf server is serviceable.\r\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TD_MSP_03-Step-1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8045c421-0144-44b3-b9a8-082ebdafb8b0",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 204);",
+							"});",
+							"",
+							"var serviceNames;",
+							"if (pm.info.iteration === 0) {",
+							"    serviceNames = ['S1-local', 'S2-local-1', 'S3-local-1', 'S1-inter-d-1', 'S2-inter-d-1', 'S3-inter-d-1', 'S4-inter-d-1', 'S1-leaf-2', 'S2-leaf-2', 'S3-leaf-1'];",
+							"} else if (pm.info.iteration === 1) {",
+							"    serviceNames = ['S1-local-1', 'S1-inter-d-2', 'S2-inter-d-2', 'S1-leaf-1', 'S2-leaf-1'];",
+							"} else if (pm.info.iteration === 2) {",
+							"    serviceNames = ['S3-local-1', 'S3-inter-d-2', 'S4-inter-d-2', 'S2-leaf-3', 'S3-leaf-2'];",
+							"}",
+							"",
+							"var deletionServiceIndex = pm.environment.get('TD_SDN_DELETE_SERVICE_INDEX');",
+							"if (deletionServiceIndex < serviceNames.length - 1 )  {",
+							"    postman.setNextRequest('TD_MSP_03-Step-1');",
+							"} else {",
+							"    pm.environment.unset('TD_SDN_DELETE_SERVICE_INDEX');",
+							"    postman.setNextRequest(null);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ab9e9634-c2d8-4b93-9474-9ec79197c369",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_ICOM_ACTIVE_LOCAL_SERVICE');",
+							"",
+							"if (pm.info.iterationCount !== 3) {",
+							"    throw new Error('This collection MUST be run with 3 iterations; One for each domain of the tree');",
+							"}",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var tree = pm.environment.get('TD_SDN_TREE');",
+							"if (tree === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_TREE\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var serviceNames;",
+							"if (pm.info.iteration === 0) {",
+							"    serviceNames = ['S1-local', 'S2-local-1', 'S3-local-1', 'S1-inter-d-1', 'S2-inter-d-1', 'S3-inter-d-1', 'S4-inter-d-1', 'S1-leaf-2', 'S2-leaf-2', 'S3-leaf-1'];",
+							"} else if (pm.info.iteration === 1) {",
+							"    serviceNames = ['S1-local-1', 'S1-inter-d-2', 'S2-inter-d-2', 'S1-leaf-1', 'S2-leaf-1'];",
+							"} else if (pm.info.iteration === 2) {",
+							"    serviceNames = ['S3-local-1', 'S3-inter-d-2', 'S4-inter-d-2', 'S2-leaf-3', 'S3-leaf-2'];",
+							"}",
+							"",
+							"var deletionServiceIndex = pm.environment.get('TD_SDN_DELETE_SERVICE_INDEX');",
+							"if (deletionServiceIndex === undefined ) {",
+							"    deletionServiceIndex = 0;",
+							"} else {",
+							"    deletionServiceIndex = parseInt(deletionServiceIndex) + 1;",
+							"}",
+							"pm.environment.set('TD_SDN_DELETE_SERVICE_INDEX', deletionServiceIndex);",
+							"var serviceName = serviceNames[deletionServiceIndex];",
+							"",
+							"",
+							"var treeIndex = parseInt(tree) - 1;",
+							"var companyName = settings.trees[treeIndex][pm.info.iteration];",
+							"var companySettings = settings.companies[companyName];",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', serviceName);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/etht-svc-instances={{TD_SDN_SERVICE_NAME}}",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"etht-svc-instances={{TD_SDN_SERVICE_NAME}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "16eb98d8-b4f7-4d9a-86ea-801a0b8b058e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "1560150e-d8b2-4b18-a6a8-a0099469e785",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

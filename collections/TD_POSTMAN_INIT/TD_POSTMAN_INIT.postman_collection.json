@@ -1,0 +1,165 @@
+{
+	"info": {
+		"_postman_id": "60bf5a95-d7f5-42d2-b03d-95af41fe1b9f",
+		"name": "TD_POSTMAN_INIT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Setup",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e8440e92-24aa-48b8-90b4-7a293806b2b8",
+						"exec": [
+							"// All Collections are based on the \"settings\" environment variable.\r",
+							"// It contains a property called \"companies\", which is actually a map\r",
+							"// which associates each company name which the properties that control the functionality\r",
+							"// Below there is a list with all supported properties.\r",
+							"//      restconfPath\r",
+							"//              Mandatory - url - It is a mandatory property which contains the URL path for\r",
+							"//              restconf api.\r",
+							"//      allNetworks\r",
+							"//              Optional - boolean - If property exists and it is true, directs Tests TD_SDN_SNSD_02,\r",
+							"//              TD_SDN_SNSD_03, TD_SDN_MNSD_02, and TD_SDN_MNSD_03 to request all networks,\r",
+							"//              instead of a particular one.\r",
+							"//      mwNetworkId\r",
+							"//              Optional - uri - It is used by Tests TD_SDN_SNSD_02 and TD_SDN_MNSD_02, only if\r",
+							"//              property \"allNetworks\" does not exist or it is false.\r",
+							"//              In that case Postman will emit a get request to retrieve the microwave network.\r",
+							"//      ethNetworkId\r",
+							"//              Optional - uri - It is used by Tests TD_SDN_SNSD_03, and TD_SDN_MNSD_03, only if\r",
+							"//              property \"allNetworks\" does not exist or it is false.\r",
+							"//              In that case Postman will emmit a get request to retrieve the microwave network.\r",
+							"//      useOnlyOnePost\r",
+							"//              Optional - boolean - It reveals that the creation of Bandwidth Profile and Service\r",
+							"//              should be done in one step only. It is used by Tests TD_SDN_SSP_01,\r",
+							"//              and TD_SDN_MNSD_01. If it is true, Step-1 bypass the following two steps\r",
+							"//              (Step-2 and Step-3) and proceeds with Step-4. Otherwise the execution order is\r",
+							"//              Step-1, Step-2, Step-3, and Step-5.\r",
+							"//      noNamespaceOnPost\r",
+							"//              Optional - boolean - It is used on Post requests of Tests TD_SDN_SSP_01,\r",
+							"//              and TD_SDN_MNSD_01 to find out if the JSON top level objects on the Requests should\r",
+							"//              be prepended with their namespace or not. Default behavior is to incluse the namespace.\r",
+							"//      mediaTypeForPosts\r",
+							"//              Optional - media type - It declares the media type (the value of Content-Type HTTP\r",
+							"//              Header that will be used on Post requests of Tests TD_SDN_SSP_01,\r",
+							"//              and TD_SDN_MNSD_01. Default value is \"application/yang-data+json\".\r",
+							"//      deletesEmptyContainer\r",
+							"//              Optional - It is used to acccept 404 Not Found as a corrent response in TD_SSP_04.\r",
+							"//              To be used by controllers that automatically delete the container when its contents are empty\r",
+							"\r",
+							"var settings = {\r",
+							"    companies: {\r",
+							"        'ExampleCompany': {\r",
+							"            restconfPath: '{{restconfPath}}',\r",
+							"            allNetworks: true,\r",
+							"            deletesEmptyContainer: true,\r",
+							"            ethClientId : 3000,\r",
+							"            ethNetworkId: 'eth-native-topology',\r",
+							"            ethProviderId : 2000,\r",
+							"            ethTopologyId : 'eth-native-topology',\r",
+							"            integratedProfile: false,\r",
+							"            higerEthSvcModelVer: true,\r",
+							"            mwNetworkId: 'mw-native-topology',\r",
+							"            useOnlyOnePost: false,\r",
+							"            svc: {\r",
+							"                'access-port1': {\r",
+							"                    'access-node-id': '10.10.1.2',\r",
+							"                    'a-link-aggr-id': 1234567\r",
+							"                },\r",
+							"                'access-port-lldp': {\r",
+							"                    'access-node-id': '10.10.1.2',\r",
+							"                    'link-lldp-id': 1234567,\r",
+							"                },\r",
+							"                'access-port2': {\r",
+							"                    'access-node-id': '10.10.1.2',\r",
+							"                    'i-d-link-W-id': 1234567,\r",
+							"                    'i-d-link-E-id': 268443778,\r",
+							"                    'a-link-local-id': 268443779\r",
+							"                }\r",
+							"            }\r",
+							"        },\r",
+							"    servicename: 'Plugtest_eth_service',\r",
+							"    cir: '49984',\r",
+							"    eir: '49984',\r",
+							"    vlanId: 100,\r",
+							"    trees:\r",
+							"    [\r",
+							"        ['ExampleCompany' ],\r",
+							"    ],\r",
+							"    indeces: \r",
+							"    [\r",
+							"        'ExampleCompany', \r",
+							"    ],\r",
+							"    lldptests: \r",
+							"        [\r",
+							"            [[0,1]],\r",
+							"        ]\r",
+							"};\r",
+							"\r",
+							"pm.environment.set('TD_SDN_SETTINGS', settings);\r",
+							"\r",
+							"company = pm.environment.get('TD_SDN_COMPANY');\r",
+							"\r",
+							"pm.environment.set('TD_SDN_COMPANY', company);\r",
+							"\r",
+							"// Environment variable denoting the Test Assignment Name from: mWT_Plugtest2_TestPlan_v0.14.docx -> Table 10.\r",
+							"// e.g. For LLDP_1 -> pm.environment.set(\"TD_LLDP_TEST\", 1); \r",
+							"//pm.environment.set(\"TD_LLDP_TEST\", 1);\r",
+							"\r",
+							"// Environment variable denoting the Test Assignment Name from: mWT_Plugtest2_TestPlan_v0.14.docx -> Table 10.\r",
+							"// e.g. For LLDP_1, Second pain (3,4)  -> pm.environment.set(\"TD_LLDP_TEST_PAIR\", 2); \r",
+							"//pm.environment.set(\"TD_LLDP_TEST_PAIR\", 2);\r",
+							"\r",
+							"// Environment variable denoting the Test Assignemnt Name from:  mWT_Plugtest2_TestPlan_v0.14.docx -> Table 8.\r",
+							"// e.g. For TREE_1 -> pm.environment.set('TD_SDN_TREE', '1');\r",
+							"//pm.environment.set('TD_SDN_TREE', '2');\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "postman-echo.com/get",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "61a4abf2-8fc7-4b5e-8621-c75c47d1aa9d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "f76552ce-7bef-4864-9fc6-0008b6c2be9f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

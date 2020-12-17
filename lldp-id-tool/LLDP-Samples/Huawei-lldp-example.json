@@ -1,0 +1,188 @@
+  {
+    "_index": "packets-2018-02-06",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.encap_type": "1",
+          "frame.time": "Feb  6, 2018 01:20:45.818667390 AEDT",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1517840445.818667390",
+          "frame.time_delta": "0.000000000",
+          "frame.time_delta_displayed": "0.000000000",
+          "frame.time_relative": "0.000000000",
+          "frame.number": "1",
+          "frame.len": "178",
+          "frame.cap_len": "178",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:lldp",
+          "frame.coloring_rule.name": "Broadcast",
+          "frame.coloring_rule.string": "eth[0] & 1"
+        },
+        "eth": {
+          "eth.dst": "01:80:c2:00:00:0e",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "LLDP_Multicast",
+            "eth.addr": "01:80:c2:00:00:0e",
+            "eth.addr_resolved": "LLDP_Multicast",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "48:46:fb:96:1b:f3",
+          "eth.src_tree": {
+            "eth.src_resolved": "HuaweiTe_96:1b:f3",
+            "eth.addr": "48:46:fb:96:1b:f3",
+            "eth.addr_resolved": "HuaweiTe_96:1b:f3",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x000088cc"
+        },
+        "lldp": {
+          "Chassis Subtype = MAC address, Id: 2c:97:b1:f6:f7:21": {
+            "lldp.tlv.type": "1",
+            "lldp.tlv.len": "7",
+            "lldp.chassis.subtype": "4",
+            "lldp.chassis.id.mac": "2c:97:b1:f6:f7:21"
+          },
+          "Port Subtype = Interface name, Id: GigabitEthernet 2\/255\/2": {
+            "lldp.tlv.type": "2",
+            "lldp.tlv.len": "24",
+            "lldp.port.subtype": "5",
+            "lldp.port.id": "GigabitEthernet 2\/255\/2"
+          },
+          "Time To Live = 121 sec": {
+            "lldp.tlv.type": "3",
+            "lldp.tlv.len": "2",
+            "lldp.time_to_live": "121"
+          },
+          "Management Address": {
+            "lldp.tlv.type": "8",
+            "lldp.tlv.len": "12",
+            "lldp.mgn.address.len": "5",
+            "lldp.mgn.address.subtype": "1",
+            "lldp.mgn.addr.ip4": "10.11.11.3",
+            "lldp.mgn.interface.subtype": "2",
+            "lldp.mgn.interface.number": "0",
+            "lldp.mgn.obj.len": "0"
+          },
+          "Port Description = GigabitEthernet 2\/255\/2 Interface": {
+            "lldp.tlv.type": "4",
+            "lldp.tlv.len": "33",
+            "lldp.port.desc": "GigabitEthernet 2\/255\/2 Interface"
+          },
+          "System Name = Huawei RTN": {
+            "lldp.tlv.type": "5",
+            "lldp.tlv.len": "10",
+            "lldp.tlv.system.name": "Huawei RTN"
+          },
+          "System Description = Huawei RTN 950UF": {
+            "lldp.tlv.type": "6",
+            "lldp.tlv.len": "16",
+            "lldp.tlv.system.desc": "Huawei RTN 950UF"
+          },
+          "Capabilities": {
+            "lldp.tlv.type": "7",
+            "lldp.tlv.len": "4",
+            "lldp.tlv.system_cap": "0x00000004",
+            "lldp.tlv.system_cap_tree": {
+              "lldp.tlv.system_cap.other": "0",
+              "lldp.tlv.system_cap.repeater": "0",
+              "lldp.tlv.system_cap.bridge": "1",
+              "lldp.tlv.system_cap.wlan_access_pt": "0",
+              "lldp.tlv.system_cap.router": "0",
+              "lldp.tlv.system_cap.telephone": "0",
+              "lldp.tlv.system_cap.docsis_cable_device": "0",
+              "lldp.tlv.system_cap.station_only": "0"
+            },
+            "lldp.tlv.enable_system_cap": "0x00000004",
+            "lldp.tlv.enable_system_cap_tree": {
+              "lldp.tlv.enable_system_cap.other": "0",
+              "lldp.tlv.enable_system_cap.repeater": "0",
+              "lldp.tlv.enable_system_cap.bridge": "1",
+              "lldp.tlv.enable_system_cap.wlan_access_pt": "0",
+              "lldp.tlv.enable_system_cap.router": "0",
+              "lldp.tlv.enable_system_cap.telephone": "0",
+              "lldp.tlv.enable_system_cap.docsis_cable_device": "0",
+              "lldp.tlv.enable_system_cap.station_only": "0"
+            }
+          },
+          "IEEE 802.1 - Port VLAN ID": {
+            "lldp.tlv.type": "127",
+            "lldp.tlv.len": "6",
+            "lldp.orgtlv.oui": "0x000080c2",
+            "lldp.ieee.802_1.subtype": "0x00000001",
+            "lldp.ieee.802_1.port_vlan.id": "1"
+          },
+          "IEEE 802.1 - Unknown subtype 0x7": {
+            "lldp.tlv.type": "127",
+            "lldp.tlv.len": "9",
+            "lldp.orgtlv.oui": "0x000080c2",
+            "lldp.ieee.802_1.subtype": "0x00000007"
+          },
+          "IEEE 802.3 - MAC\/PHY Configuration\/Status": {
+            "lldp.tlv.type": "127",
+            "lldp.tlv.len": "9",
+            "lldp.orgtlv.oui": "0x0000120f",
+            "lldp.ieee.802_3.subtype": "0x00000001",
+            "lldp.ieee.802_3.mac_phy_auto_neg_status": "0x00000003",
+            "lldp.ieee.802_3.mac_phy_auto_neg_status_tree": {
+              "lldp.ieee.802_3.mac_phy_auto_neg_status.supported": "1",
+              "lldp.ieee.802_3.mac_phy_auto_neg_status.enabled": "1"
+            },
+            "lldp.ieee.802_3.pmd_auto_neg_advertised_caps": "0x00000000",
+            "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_tree": {
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.1000base_tfd": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.1000base_t": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.1000base_xfd": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.1000base_x": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.fdx_bpause": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.fdx_spause": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.fdx_apause": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.fdx_pause": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.100base_t2fd": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.100base_t2": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.100base_txfd": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.100base_tx": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.100base_t4": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.10base_tfd": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.10base_t": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps.other": "0"
+            },
+            "Same in inverse (wrong) bitorder": {
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.1000base_tfd": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.1000base_t": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.1000base_xfd": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.1000base_x": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.fdx_bpause": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.fdx_spause": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.fdx_apause": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.fdx_pause": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.100base_t2fd": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.100base_t2": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.100base_txfd": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.100base_tx": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.100base_t4": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.10base_tfd": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.10base_t": "0",
+              "lldp.ieee.802_3.pmd_auto_neg_advertised_caps_inv.other": "0"
+            },
+            "lldp.ieee.802_3.pmd_mau_type": "0x0000001e"
+          },
+          "IEEE 802.3 - Maximum Frame Size": {
+            "lldp.tlv.type": "127",
+            "lldp.tlv.len": "6",
+            "lldp.orgtlv.oui": "0x0000120f",
+            "lldp.ieee.802_3.subtype": "0x00000004",
+            "lldp.ieee.802_3.max_frame_size": "1522"
+          },
+          "End of LLDPDU": {
+            "lldp.tlv.type": "0",
+            "lldp.tlv.len": "0"
+          }
+        }
+      }
+    }
+  }

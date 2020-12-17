@@ -1,0 +1,140 @@
+{
+	"info": {
+		"_postman_id": "3f44c072-7449-4a4a-805c-4d19fdc719ce",
+		"name": "TD_MSP_04",
+		"description": "Interoperability Test Description\r\nIdentifier\tTD_ SDN_SSP_02\r\nTest Objective\tThe service topology information is requested from the single DC under test in TD_SDN_SSP_01. The received information is checked to correctly list the newly created service.\r\nConfiguration\tCFG_03\r\nReferences\t\r\nApplicability\tMW_8040, MW_8345, MW_TETOPO, MW_MWTOPO, MW_ETHSVC\r\n\r\nPre-test conditions\t•\tThe Domain Controller instance is up and running normally\r\n•\tAll the devices are upgraded to correct versions\r\n•\tAll basic configurations are completed (e.g., NE_id, OSPF, PCEP, etc.) \r\n•\tThe Restconf server is serviceable.\r\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TD_ MSP_04-Step-1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "27d06c73-3416-431a-ab9c-51bf59c2b2f8",
+						"exec": [
+							"// clean environment variables",
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"",
+							"// Step-1, validation: The response body should contain information about the created L2 service in JSON format referring to Annex D.3",
+							"pm.test('Response is OK', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 200);",
+							"});",
+							"var responseJson = pm.response.json();",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"var tree = pm.environment.get('TD_SDN_TREE');",
+							"",
+							"var treeIndex = parseInt(tree) - 1;",
+							"var companyName = settings.trees[treeIndex][pm.info.iteration];",
+							"var companySettings = settings.companies[companyName];",
+							"",
+							"var serviceNames;",
+							"if (pm.info.iteration === 0) {",
+							"    serviceNames = ['S1-local', 'S2-local-1', 'S3-local-1', 'S1-inter-d-1', 'S2-inter-d-1', 'S3-inter-d-1', 'S4-inter-d-1', 'S1-leaf-2', 'S2-leaf-2', 'S3-leaf-1'];",
+							"} else if (pm.info.iteration === 1) {",
+							"    serviceNames = ['S1-local-1', 'S1-inter-d-2', 'S2-inter-d-2', 'S1-leaf-1', 'S2-leaf-1'];",
+							"} else if (pm.info.iteration === 2) {",
+							"    serviceNames = ['S3-local-1', 'S3-inter-d-2', 'S4-inter-d-2', 'S2-leaf-3', 'S3-leaf-2'];",
+							"}",
+							"",
+							"(function() {",
+							"    var topLevelPropertyName = responseJson.hasOwnProperty('etht-svc') ? 'etht-svc' : 'ietf-eth-tran-service:etht-svc';",
+							"    var topLevelObject = null;",
+							"    pm.test('validate Response Body', function() {",
+							"        pm.expect(responseJson).to.have.property(topLevelPropertyName);",
+							"        topLevelObject = responseJson[topLevelPropertyName];",
+							"    });",
+							"    var service = null;",
+							"    if (topLevelObject.hasOwnProperty(['etht-svc-instances'])) {",
+							"        ",
+							"        pm.test('Validate Response Body for \"etht-svc-instances\" array', function() {",
+							"            var instanceArr = topLevelObject['etht-svc-instances'];",
+							"            pm.expect(Array.isArray(instanceArr)).be.true;",
+							"        });",
+							"        ",
+							"        var serviceInstances = responseJson[topLevelPropertyName][\"etht-svc-instances\"];",
+							"        pm.test('Validation Response body for services', function() {",
+							"            for(var i = 0; i < serviceNames.length; i++) {",
+							"                var serviceName = serviceNames[i];",
+							"                var service = findOurServiceWithServiceName(serviceInstances, serviceName);",
+							"                checkNonExistenceOfService(service, serviceName);",
+							"            }",
+							"        });",
+							"    }",
+							"}());",
+							"",
+							"function findOurServiceWithServiceName(instanceArr, serviceName) {",
+							"    var len = instanceArr.length;",
+							"    for (var i = 0; i < len; ++i) {",
+							"        var svc = instanceArr[i];",
+							"        if (svc['etht-svc-name'] === serviceName) {",
+							"            return svc;",
+							"        }",
+							"    }",
+							"    return null;",
+							"}",
+							"",
+							"function checkNonExistenceOfService(service, serviceName) {",
+							"    pm.test('Service non existence check: ' + serviceName, function(){",
+							"        pm.expect(service === null).to.be.true;",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d8db2f60-2f1c-44a0-9780-ce327e9a1a09",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"",
+							"if (pm.info.iterationCount !== 3) {",
+							"    throw new Error('This collection MUST be run with 3 iterations; One for each domain of the tree');",
+							"}",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var tree = pm.environment.get('TD_SDN_TREE');",
+							"if (tree === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_TREE\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var treeIndex = parseInt(tree) - 1;",
+							"var companyName = settings.trees[treeIndex][pm.info.iteration];",
+							"var companySettings = settings.companies[companyName];",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

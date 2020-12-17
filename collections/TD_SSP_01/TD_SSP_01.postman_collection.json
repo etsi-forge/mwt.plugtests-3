@@ -1,0 +1,679 @@
+{
+	"info": {
+		"_postman_id": "03f6dc11-8dc7-4545-b117-803fd501ce36",
+		"name": "TD_SSP_01",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TD_SSP_01-Step-1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7367f22d-9130-47fa-8482-84a256a0cdee",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings.integratedProfile) {",
+							"    console.log(\"We will execute the step-3-2 without setting up bandwidth profiles\");",
+							"    postman.setNextRequest('TD_SSP_01-Step-3-2');",
+							"}",
+							"if (companySettings.useOnlyOnePost) {",
+							"    console.log(\"We will execute the last step with full information\");",
+							"    postman.setNextRequest('TD_SDN_SSP_01-Step-3');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7f6d1150-5f1b-4f1b-a49b-b2a4f3c2888d",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-yang-library:modules-state",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-yang-library:modules-state"
+					]
+				},
+				"description": "This step checks to see if two separated requests will be used, or the creation of Bandwidth Profile and Service should be done in one step only."
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_01-Step-2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2d107671-69cd-4cc6-bdec-95f0195f2060",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_CIR_VALUE');",
+							"pm.environment.unset('TD_SDN_EIR_VALUE');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 201);",
+							"    // should we check for status 409 (in case profile already exists)?",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e316b148-9a65-42cd-961d-b80e6c75696e",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_CIR_VALUE');",
+							"pm.environment.unset('TD_SDN_EIR_VALUE');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"var mediaType = companySettings.hasOwnProperty('mediaTypeForPosts')",
+							"        ? companySettings.mediaTypeForPosts : 'application/yang-data+json';",
+							"var namespacePrefix = !companySettings.noNamespaceOnPost ? 'ietf-eth-tran-service:' : '';",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_MEDIA_TYPE', mediaType);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', settings.servicename);",
+							"pm.environment.set('TD_SDN_CIR_VALUE', settings.cir);",
+							"pm.environment.set('TD_SDN_EIR_VALUE', settings.eir);",
+							"pm.environment.set('TD_SDN_NAMESPACE_PREFIX', namespacePrefix);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"etht-svc-bandwidth-profiles\": [\r\n        {\r\n            \"bandwidth-profile-name\": \"bw_profile_{{TD_SDN_SERVICE_NAME}}\",\r\n            \"bandwidth-profile-type\": \"ietf-eth-tran-types:mef-10-bwp\",\r\n            \"CIR\": \"{{TD_SDN_CIR_VALUE}}\",\r\n            \"EIR\": \"{{TD_SDN_EIR_VALUE}}\",\r\n            \"color-aware\": true,\r\n            \"coupling-flag\": true\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc/globals",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc",
+						"globals"
+					]
+				},
+				"description": "This step provides for the creation of a Bandwidth Profile. If a Provider does not support it, this step will be skipped (Step-1 will take care for that) and Test will continue with Step-3."
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_01-Step-3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "23094251-4807-40ea-8cb2-e8d31a5c8ce6",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_VLAN_ID');",
+							"pm.environment.unset('TD_SDN_ETH_PROVIDER_ID');",
+							"pm.environment.unset('TD_SDN_ETH_CLIENT_ID');",
+							"pm.environment.unset('TD_SDN_ETH_TOPOLOGY_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID1');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID2');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_S1_LOCAL_ADMIN_STATUS');",
+							"pm.environment.unset('TD_SDN_S2_LOCAL_ADMIN_STATUS');",
+							"pm.environment.unset('TD_SDN_S3_LOCAL_ADMIN_STATUS');",
+							"",
+							"// postman.setNextRequest('TD_SDN_SSP_01-Step-5');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 201);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f8c9f95c-8a5e-4661-abbb-7e80a6f1762c",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_VLAN_ID');",
+							"pm.environment.unset('TD_SDN_ETH_PROVIDER_ID');",
+							"pm.environment.unset('TD_SDN_ETH_CLIENT_ID');",
+							"pm.environment.unset('TD_SDN_ETH_TOPOLOGY_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID1');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID2');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ACCESS_ID');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"if (!companySettings.svc) {",
+							"    throw new Error('Information about svc is not known. Please run '",
+							"            + '\"TD_SDN_SNSD_03-Step-1\"');",
+							"}",
+							"",
+							"var s1_local_admin = \"up\";",
+							"var s2_local_admin = \"up\";",
+							"var s3_local_admin = \"up\";",
+							"",
+							"if ('Intracom' === companyName) {",
+							"    s1_local_admin = \"down\";",
+							"    s2_local_admin = \"down\";",
+							"    s3_local_admin = \"down\";",
+							"}",
+							"",
+							"var mediaType = companySettings.hasOwnProperty('mediaTypeForPosts')",
+							"        ? companySettings.mediaTypeForPosts : 'application/yang-data+json';",
+							"",
+							"var namespacePrefix = !companySettings.noNamespaceOnPost ? 'ietf-eth-tran-service:' : '';",
+							"",
+							"",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_MEDIA_TYPE', mediaType);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', settings.servicename);",
+							"pm.environment.set('TD_SDN_VLAN_ID', settings.vlanId);",
+							"pm.environment.set('TD_SDN_ETH_PROVIDER_ID', companySettings.ethProviderId);",
+							"pm.environment.set('TD_SDN_ETH_CLIENT_ID', companySettings.ethClientId);",
+							"pm.environment.set('TD_SDN_ETH_TOPOLOGY_ID', companySettings.ethTopologyId);",
+							"pm.environment.set('TD_SDN_ACCESS_TE_NODE_ID1', companySettings.svc['access-port1']['access-node-id']);",
+							"pm.environment.set('TD_SDN_A_LINK_AGGR_1_TE_TP_ID', companySettings.svc['access-port1']['a-link-aggr-id']);",
+							"pm.environment.set('TD_SDN_A_LINK_AGGR_1_TE_TP_ACCESS_ID', companySettings.svc['access-port1']['a-link-aggr-access-id']);",
+							"pm.environment.set('TD_SDN_ACCESS_TE_NODE_ID2', companySettings.svc['access-port2']['access-node-id']);",
+							"pm.environment.set('TD_SDN_A_LINK_LOCAL_11_TE_TP_ID', companySettings.svc['access-port2']['a-link-local-id']);",
+							"pm.environment.set('TD_SDN_A_LINK_LOCAL_11_TE_TP_ACCESS_ID', companySettings.svc['access-port2']['a-link-local-access-id']);",
+							"pm.environment.set('TD_SDN_I_D_LINK_1E_TE_TP_ID', companySettings.svc['access-port2']['i-d-link-E-id']);",
+							"pm.environment.set('TD_SDN_I_D_LINK_1E_TE_TP_ACCESS_ID', companySettings.svc['access-port2']['i-d-link-E-access-id']);",
+							"pm.environment.set('TD_SDN_I_D_LINK_1W_TE_TP_ID', companySettings.svc['access-port2']['i-d-link-W-id']);",
+							"pm.environment.set('TD_SDN_I_D_LINK_1W_TE_TP_ACCESS_ID', companySettings.svc['access-port2']['i-d-link-W-access-id']);",
+							"pm.environment.set('TD_SDN_NAMESPACE_PREFIX', namespacePrefix);",
+							"",
+							"pm.environment.set('TD_SDN_S1_LOCAL_ADMIN_STATUS', s1_local_admin);",
+							"pm.environment.set('TD_SDN_S2_LOCAL_ADMIN_STATUS', s2_local_admin);",
+							"pm.environment.set('TD_SDN_S3_LOCAL_ADMIN_STATUS', s3_local_admin);",
+							"",
+							"// Skip TD_SSP_01-Step-3-2",
+							"//postman.setNextRequest(null);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"{{TD_SDN_NAMESPACE_PREFIX}}etht-svc-instances\": [\r\n        {\r\n            \"etht-svc-name\": \"S1_local\",\r\n            \"access-provider-id\": \"{{TD_SDN_ETH_PROVIDER_ID}}\",\r\n            \"access-client-id\": \"{{TD_SDN_ETH_CLIENT_ID}}\",\r\n            \"access-topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\",\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"admin-status\": \"ietf-te-types:tunnel-state-{{TD_SDN_S1_LOCAL_ADMIN_STATUS}}\",\r\n            \"etht-svc-access-ports\": [\r\n                {\r\n                    \"access-port-id\": 1,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID1}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_A_LINK_AGGR_1_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 201\r\n                    }\r\n                },\r\n                {\r\n                    \"access-port-id\": 2,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_A_LINK_LOCAL_11_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-c-vlan\",\r\n                        \"vlan-value\": 101\r\n                    },\r\n                    \"ingress-egress-bandwidth-profile-name\": \"bw_profile_{{TD_SDN_SERVICE_NAME}}\"\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"etht-svc-name\": \"S2_local\",\r\n            \"access-provider-id\": \"{{TD_SDN_ETH_PROVIDER_ID}}\",\r\n            \"access-client-id\": \"{{TD_SDN_ETH_CLIENT_ID}}\",\r\n            \"access-topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\",\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"admin-status\": \"ietf-te-types:tunnel-state-{{TD_SDN_S2_LOCAL_ADMIN_STATUS}}\",\r\n            \"etht-svc-access-ports\": [\r\n                {\r\n                    \"access-port-id\": 1,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID1}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_A_LINK_AGGR_1_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 209\r\n                    }\r\n                },\r\n                {\r\n                    \"access-port-id\": 2,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_A_LINK_LOCAL_11_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-c-vlan\",\r\n                        \"vlan-value\": 103\r\n                    },\r\n                    \"ingress-egress-bandwidth-profile-name\": \"bw_profile_{{TD_SDN_SERVICE_NAME}}\"\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"etht-svc-name\": \"S3_local\",\r\n            \"access-provider-id\": \"{{TD_SDN_ETH_PROVIDER_ID}}\",\r\n            \"access-client-id\": \"{{TD_SDN_ETH_CLIENT_ID}}\",\r\n            \"access-topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\",\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"admin-status\": \"ietf-te-types:tunnel-state-{{TD_SDN_S3_LOCAL_ADMIN_STATUS}}\",\r\n            \"etht-svc-access-ports\": [\r\n                {\r\n                    \"access-port-id\": 1,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID1}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_A_LINK_AGGR_1_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 210\r\n                    }\r\n                },\r\n                {\r\n                    \"access-port-id\": 2,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_A_LINK_LOCAL_11_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-c-vlan\",\r\n                        \"vlan-value\": 104\r\n                    },\r\n                    \"ingress-egress-bandwidth-profile-name\": \"bw_profile_{{TD_SDN_SERVICE_NAME}}\"\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"etht-svc-name\": \"S1-inter-d\",\r\n            \"access-provider-id\": \"{{TD_SDN_ETH_PROVIDER_ID}}\",\r\n            \"access-client-id\": \"{{TD_SDN_ETH_CLIENT_ID}}\",\r\n            \"access-topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\",\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"admin-status\": \"ietf-te-types:tunnel-state-up\",\r\n            \"etht-svc-access-ports\": [\r\n                {\r\n                    \"access-port-id\": 1,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID1}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_A_LINK_AGGR_1_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 202\r\n                    }\r\n                },\r\n                {\r\n                    \"access-port-id\": 2,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_I_D_LINK_1W_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 202\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"etht-svc-name\": \"S2-inter-d\",\r\n            \"access-provider-id\": \"{{TD_SDN_ETH_PROVIDER_ID}}\",\r\n            \"access-client-id\": \"{{TD_SDN_ETH_CLIENT_ID}}\",\r\n            \"access-topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\",\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"admin-status\": \"ietf-te-types:tunnel-state-up\",\r\n            \"etht-svc-access-ports\": [\r\n                {\r\n                    \"access-port-id\": 1,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID1}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_A_LINK_AGGR_1_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 203\r\n                    }\r\n                },\r\n                {\r\n                    \"access-port-id\": 2,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_I_D_LINK_1E_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 203\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc"
+					]
+				},
+				"description": "It sends a POST request in order to create the actual service. This step (as Step-2) will be executed only if it is supported. Otherwise Step-1 will continue with Step-3. After the execution of this step, Step-3 will be skipped."
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_01-Step-4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "340e6fe7-68bc-42a8-ac56-621ac4e84f03",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_VLAN_ID');",
+							"pm.environment.unset('TD_SDN_ETH_PROVIDER_ID');",
+							"pm.environment.unset('TD_SDN_ETH_CLIENT_ID');",
+							"pm.environment.unset('TD_SDN_ETH_TOPOLOGY_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID1');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID2');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_S1_LOCAL_ADMIN_STATUS');",
+							"pm.environment.unset('TD_SDN_S2_LOCAL_ADMIN_STATUS');",
+							"pm.environment.unset('TD_SDN_S3_LOCAL_ADMIN_STATUS');",
+							"",
+							"// postman.setNextRequest('TD_SDN_SSP_01-Step-5');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 201);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b3beaf14-2495-4a62-ba22-8555e9d0eeaf",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_VLAN_ID');",
+							"pm.environment.unset('TD_SDN_ETH_PROVIDER_ID');",
+							"pm.environment.unset('TD_SDN_ETH_CLIENT_ID');",
+							"pm.environment.unset('TD_SDN_ETH_TOPOLOGY_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID1');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID2');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ACCESS_ID');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"if (!companySettings.svc) {",
+							"    throw new Error('Information about svc is not known. Please run '",
+							"            + '\"TD_SDN_SNSD_03-Step-1\"');",
+							"}",
+							"",
+							"var s1_local_admin = \"up\";",
+							"var s2_local_admin = \"up\";",
+							"var s3_local_admin = \"up\";",
+							"",
+							"if ('Intracom' === companyName) {",
+							"    s1_local_admin = \"down\";",
+							"    s2_local_admin = \"down\";",
+							"    s3_local_admin = \"down\";",
+							"}",
+							"",
+							"var mediaType = companySettings.hasOwnProperty('mediaTypeForPosts')",
+							"        ? companySettings.mediaTypeForPosts : 'application/yang-data+json';",
+							"",
+							"var namespacePrefix = !companySettings.noNamespaceOnPost ? 'ietf-eth-tran-service:' : '';",
+							"",
+							"",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_MEDIA_TYPE', mediaType);",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', settings.servicename);",
+							"pm.environment.set('TD_SDN_VLAN_ID', settings.vlanId);",
+							"pm.environment.set('TD_SDN_ETH_PROVIDER_ID', companySettings.ethProviderId);",
+							"pm.environment.set('TD_SDN_ETH_CLIENT_ID', companySettings.ethClientId);",
+							"pm.environment.set('TD_SDN_ETH_TOPOLOGY_ID', companySettings.ethTopologyId);",
+							"pm.environment.set('TD_SDN_ACCESS_TE_NODE_ID1', companySettings.svc['access-port1']['access-node-id']);",
+							"pm.environment.set('TD_SDN_A_LINK_AGGR_1_TE_TP_ID', companySettings.svc['access-port1']['a-link-aggr-id']);",
+							"pm.environment.set('TD_SDN_A_LINK_AGGR_1_TE_TP_ACCESS_ID', companySettings.svc['access-port1']['a-link-aggr-access-id']);",
+							"pm.environment.set('TD_SDN_ACCESS_TE_NODE_ID2', companySettings.svc['access-port2']['access-node-id']);",
+							"pm.environment.set('TD_SDN_A_LINK_LOCAL_11_TE_TP_ID', companySettings.svc['access-port2']['a-link-local-id']);",
+							"pm.environment.set('TD_SDN_A_LINK_LOCAL_11_TE_TP_ACCESS_ID', companySettings.svc['access-port2']['a-link-local-access-id']);",
+							"pm.environment.set('TD_SDN_I_D_LINK_1E_TE_TP_ID', companySettings.svc['access-port2']['i-d-link-E-id']);",
+							"pm.environment.set('TD_SDN_I_D_LINK_1E_TE_TP_ACCESS_ID', companySettings.svc['access-port2']['i-d-link-E-access-id']);",
+							"pm.environment.set('TD_SDN_I_D_LINK_1W_TE_TP_ID', companySettings.svc['access-port2']['i-d-link-W-id']);",
+							"pm.environment.set('TD_SDN_I_D_LINK_1W_TE_TP_ACCESS_ID', companySettings.svc['access-port2']['i-d-link-W-access-id']);",
+							"pm.environment.set('TD_SDN_NAMESPACE_PREFIX', namespacePrefix);",
+							"",
+							"pm.environment.set('TD_SDN_S1_LOCAL_ADMIN_STATUS', s1_local_admin);",
+							"pm.environment.set('TD_SDN_S2_LOCAL_ADMIN_STATUS', s2_local_admin);",
+							"pm.environment.set('TD_SDN_S3_LOCAL_ADMIN_STATUS', s3_local_admin);",
+							"",
+							"// Skip TD_SSP_01-Step-3-2",
+							"postman.setNextRequest(null);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"{{TD_SDN_NAMESPACE_PREFIX}}etht-svc-instances\": [\r\n        {\r\n            \"etht-svc-name\": \"S2-leaf2\",\r\n            \"access-provider-id\": \"{{TD_SDN_ETH_PROVIDER_ID}}\",\r\n            \"access-client-id\": \"{{TD_SDN_ETH_CLIENT_ID}}\",\r\n            \"access-topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\",\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"admin-status\": \"ietf-te-types:tunnel-state-up\",\r\n            \"etht-svc-access-ports\": [\r\n                {\r\n                    \"access-port-id\": 1,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_I_D_LINK_1W_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 2009\r\n                    }\r\n                },\r\n                {\r\n                    \"access-port-id\": 2,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_A_LINK_LOCAL_11_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-c-vlan\",\r\n                        \"vlan-value\": 1003\r\n                    },\r\n                    \"ingress-egress-bandwidth-profile-name\": \"bw_profile_{{TD_SDN_SERVICE_NAME}}\"\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"etht-svc-name\": \"S1-leaf2\",\r\n            \"access-provider-id\": \"{{TD_SDN_ETH_PROVIDER_ID}}\",\r\n            \"access-client-id\": \"{{TD_SDN_ETH_CLIENT_ID}}\",\r\n            \"access-topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\",\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"admin-status\": \"ietf-te-types:tunnel-state-up\",\r\n            \"etht-svc-access-ports\": [\r\n                {\r\n                    \"access-port-id\": 1,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_I_D_LINK_1W_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 208\r\n                    }\r\n                },\r\n                {\r\n                    \"access-port-id\": 2,\r\n                    \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                    \"access-ltp-id\": {{TD_SDN_I_D_LINK_1E_TE_TP_ID}},\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 208\r\n                    }\r\n                }\r\n                \r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc"
+					]
+				},
+				"description": "It sends a POST request in order to create the actual service. This step (as Step-2) will be executed only if it is supported. Otherwise Step-1 will continue with Step-3. After the execution of this step, Step-3 will be skipped."
+			},
+			"response": []
+		},
+		{
+			"name": "TD_SSP_01-Step-3-2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8c5809f2-d321-461b-9a1e-832743977db2",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_VLAN_ID');",
+							"pm.environment.unset('TD_SDN_ETH_PROVIDER_ID');",
+							"pm.environment.unset('TD_SDN_ETH_CLIENT_ID');",
+							"pm.environment.unset('TD_SDN_ETH_TOPOLOGY_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID1');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID2');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ACCESS_ID');",
+							"",
+							"postman.setNextRequest('TD_SDN_SSP_01-Step-5');",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 201);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a60fdebe-7c2a-4642-9c52-b8d1dce983ff",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');\r",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');\r",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');\r",
+							"pm.environment.unset('TD_SDN_VLAN_ID');\r",
+							"pm.environment.unset('TD_SDN_ETH_PROVIDER_ID');\r",
+							"pm.environment.unset('TD_SDN_ETH_CLIENT_ID');\r",
+							"pm.environment.unset('TD_SDN_ETH_TOPOLOGY_ID');\r",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID1');\r",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ID');\r",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID2');\r",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ID');\r",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ID');\r",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ID');\r",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');\r",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ACCESS_ID');\r",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ACCESS_ID');\r",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ACCESS_ID');\r",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ACCESS_ID');\r",
+							"\r",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');\r",
+							"if (settings === undefined) {\r",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '\r",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');\r",
+							"}\r",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');\r",
+							"if (companyName === undefined) {\r",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '\r",
+							"            + 'Please define it in your environment');\r",
+							"}\r",
+							"var companySettings = settings.companies[companyName];\r",
+							"if (companySettings === undefined) {\r",
+							"    throw new Error('Unknown company \"' + companyName + '\"');\r",
+							"}\r",
+							"\r",
+							"if (!companySettings.svc) {\r",
+							"    throw new Error('Information about svc is not known. Please run '\r",
+							"            + '\"TD_SDN_SNSD_03-Step-1\"');\r",
+							"}\r",
+							"\r",
+							"var s1_local_admin = \"up\";\r",
+							"var s2_local_admin = \"up\";\r",
+							"var s3_local_admin = \"up\";\r",
+							"\r",
+							"if ('Intracom' === companyName) {\r",
+							"    s2_local_admin = \"down\";\r",
+							"    s3_local_admin = \"down\";\r",
+							"}\r",
+							"\r",
+							"var mediaType = companySettings.hasOwnProperty('mediaTypeForPosts')\r",
+							"        ? companySettings.mediaTypeForPosts : 'application/yang-data+json';\r",
+							"\r",
+							"var namespacePrefix = !companySettings.noNamespaceOnPost ? 'ietf-eth-tran-service:' : '';\r",
+							"\r",
+							"var higerEthSvcModelVer = companySettings.higerEthSvcModelVer;\r",
+							"\r",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);\r",
+							"pm.environment.set('TD_SDN_MEDIA_TYPE', mediaType);\r",
+							"pm.environment.set('TD_SDN_SERVICE_NAME', settings.servicename);\r",
+							"pm.environment.set('TD_SDN_VLAN_ID', settings.vlanId);\r",
+							"pm.environment.set('TD_SDN_ETH_PROVIDER_ID', companySettings.ethProviderId);\r",
+							"pm.environment.set('TD_SDN_ETH_CLIENT_ID', companySettings.ethClientId);\r",
+							"pm.environment.set('TD_SDN_ETH_TOPOLOGY_ID', companySettings.ethTopologyId);\r",
+							"pm.environment.set('TD_SDN_ACCESS_TE_NODE_ID1', companySettings.svc['access-port1']['access-node-id']);\r",
+							"pm.environment.set('TD_SDN_A_LINK_AGGR_1_TE_TP_ID', companySettings.svc['access-port1']['a-link-aggr-id']);\r",
+							"pm.environment.set('TD_SDN_A_LINK_AGGR_1_TE_TP_ACCESS_ID', companySettings.svc['access-port1']['a-link-aggr-access-id']);\r",
+							"pm.environment.set('TD_SDN_ACCESS_TE_NODE_ID2', companySettings.svc['access-port2']['access-node-id']);\r",
+							"pm.environment.set('TD_SDN_A_LINK_LOCAL_11_TE_TP_ID', companySettings.svc['access-port2']['a-link-local-id']);\r",
+							"pm.environment.set('TD_SDN_A_LINK_LOCAL_11_TE_TP_ACCESS_ID', companySettings.svc['access-port2']['a-link-local-access-id']);\r",
+							"pm.environment.set('TD_SDN_I_D_LINK_1E_TE_TP_ID', companySettings.svc['access-port2']['i-d-link-E-id']);\r",
+							"pm.environment.set('TD_SDN_I_D_LINK_1E_TE_TP_ACCESS_ID', companySettings.svc['access-port2']['i-d-link-E-access-id']);\r",
+							"pm.environment.set('TD_SDN_I_D_LINK_1W_TE_TP_ID', companySettings.svc['access-port2']['i-d-link-W-id']);\r",
+							"pm.environment.set('TD_SDN_I_D_LINK_1W_TE_TP_ACCESS_ID', companySettings.svc['access-port2']['i-d-link-W-access-id']);\r",
+							"pm.environment.set('TD_SDN_NAMESPACE_PREFIX', namespacePrefix);\r",
+							"pm.environment.set('TD_SDN_CIR_VALUE', settings.cir);\r",
+							"pm.environment.set('TD_SDN_EIR_VALUE', settings.eir);\r",
+							"\r",
+							"pm.environment.set('TD_SDN_S1_LOCAL_ADMIN_STATUS', s1_local_admin);\r",
+							"pm.environment.set('TD_SDN_S2_LOCAL_ADMIN_STATUS', s2_local_admin);\r",
+							"pm.environment.set('TD_SDN_S3_LOCAL_ADMIN_STATUS', s3_local_admin);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ietf-eth-tran-service:etht-svc-instances\": [\r\n        {\r\n            \"etht-svc-name\": \"S1_local\",\r\n            \"te-topology-identifier\": {\r\n                \"provider-id\": {{TD_SDN_ETH_PROVIDER_ID}},\r\n                \"client-id\": {{TD_SDN_ETH_CLIENT_ID}},\r\n                \"topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\"\r\n            },\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"etht-svc-end-points\": [\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"1\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID1}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_A_LINK_AGGR_1_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 201\r\n                    }\r\n                },\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"2\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_A_LINK_LOCAL_11_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-c-vlan\",\r\n                        \"vlan-value\": 101\r\n                    },\r\n                    \"ingress-egress-bandwidth-profile\": {\r\n                        \"bandwidth-profile-type\": \"ietf-eth-tran-types:mef-10-bwp\",\r\n                        \"CIR\": \"{{TD_SDN_CIR_VALUE}}\",\r\n                        \"EIR\": \"{{TD_SDN_EIR_VALUE}}\"\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n\t\t{\r\n            \"etht-svc-name\": \"S2_local\",\r\n            \"te-topology-identifier\": {\r\n                \"provider-id\": {{TD_SDN_ETH_PROVIDER_ID}},\r\n                \"client-id\": {{TD_SDN_ETH_CLIENT_ID}},\r\n                \"topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\"\r\n            },\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"etht-svc-end-points\": [\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"1\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID1}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_A_LINK_AGGR_1_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 209\r\n                    }\r\n                },\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"2\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_A_LINK_LOCAL_11_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-c-vlan\",\r\n                        \"vlan-value\": 103\r\n                    },\r\n                    \"ingress-egress-bandwidth-profile\": {\r\n                        \"bandwidth-profile-type\": \"ietf-eth-tran-types:mef-10-bwp\",\r\n                        \"CIR\": \"{{TD_SDN_CIR_VALUE}}\",\r\n                        \"EIR\": \"{{TD_SDN_EIR_VALUE}}\"\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n\t\t{\r\n            \"etht-svc-name\": \"S3_local\",\r\n            \"te-topology-identifier\": {\r\n                \"provider-id\": {{TD_SDN_ETH_PROVIDER_ID}},\r\n                \"client-id\": {{TD_SDN_ETH_CLIENT_ID}},\r\n                \"topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\"\r\n            },\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"etht-svc-end-points\": [\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"1\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID1}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_A_LINK_AGGR_1_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 210\r\n                    }\r\n                },\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"2\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_A_LINK_LOCAL_11_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-c-vlan\",\r\n                        \"vlan-value\": 104\r\n                    },\r\n                    \"ingress-egress-bandwidth-profile\": {\r\n                        \"bandwidth-profile-type\": \"ietf-eth-tran-types:mef-10-bwp\",\r\n                        \"CIR\": \"{{TD_SDN_CIR_VALUE}}\",\r\n                        \"EIR\": \"{{TD_SDN_EIR_VALUE}}\"\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n\t\t{\r\n            \"etht-svc-name\": \"S1-inter-d\",\r\n            \"te-topology-identifier\": {\r\n                \"provider-id\": {{TD_SDN_ETH_PROVIDER_ID}},\r\n                \"client-id\": {{TD_SDN_ETH_CLIENT_ID}},\r\n                \"topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\"\r\n            },\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"etht-svc-end-points\": [\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"1\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID1}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_A_LINK_AGGR_1_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 202\r\n                    }\r\n                },\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"2\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_I_D_LINK_1W_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 202\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n\t\t{\r\n            \"etht-svc-name\": \"S2-inter-d\",\r\n            \"te-topology-identifier\": {\r\n                \"provider-id\": {{TD_SDN_ETH_PROVIDER_ID}},\r\n                \"client-id\": {{TD_SDN_ETH_CLIENT_ID}},\r\n                \"topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\"\r\n            },\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"etht-svc-end-points\": [\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"1\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID1}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_A_LINK_AGGR_1_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 203\r\n                    }\r\n                },\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"2\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_I_D_LINK_1E_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 203\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"etht-svc-name\": \"S1-leaf2\",\r\n            \"te-topology-identifier\": {\r\n                \"provider-id\": {{TD_SDN_ETH_PROVIDER_ID}},\r\n                \"client-id\": {{TD_SDN_ETH_CLIENT_ID}},\r\n                \"topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\"\r\n            },\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"etht-svc-end-points\": [\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"1\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_I_D_LINK_1W_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 208\r\n                    }\r\n                },\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"2\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_I_D_LINK_1E_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 208\r\n                    }\r\n                }\r\n            ]\r\n        },\r\n         {\r\n            \"etht-svc-name\": \"S2-leaf2\",\r\n            \"te-topology-identifier\": {\r\n                \"provider-id\": {{TD_SDN_ETH_PROVIDER_ID}},\r\n                \"client-id\": {{TD_SDN_ETH_CLIENT_ID}},\r\n                \"topology-id\": \"{{TD_SDN_ETH_TOPOLOGY_ID}}\"\r\n            },\r\n            \"etht-svc-type\": \"ietf-eth-tran-types:p2p-svc\",\r\n            \"etht-svc-end-points\": [\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"1\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_I_D_LINK_1W_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-s-vlan\",\r\n                        \"vlan-value\": 2009\r\n                    }\r\n                },\r\n                {\r\n                    \"etht-svc-access-points\": [\r\n                        {\r\n                            \"access-point-id\": \"2\",\r\n                            \"access-node-id\": \"{{TD_SDN_ACCESS_TE_NODE_ID2}}\",\r\n                            \"access-ltp-id\": {{TD_SDN_A_LINK_LOCAL_11_TE_TP_ID}}\r\n                        }\r\n                    ],\r\n                    \"service-classification-type\": \"ietf-eth-tran-types:vlan-classification\",\r\n                    \"outer-tag\": {\r\n                        \"tag-type\": \"ietf-eth-tran-types:classify-c-vlan\",\r\n                        \"vlan-value\": 1003\r\n                    }\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc"
+					]
+				},
+				"description": "Another version of TD_SSP_01-Step-3, which uses integrated bandwidth profile and ietf-eth-tran-service@2019-11-03.yang"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d9bfcadc-edcc-4a9c-98e8-1149fb0bc30b",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "b13409e7-577c-4323-bf32-1cd4ade56e37",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

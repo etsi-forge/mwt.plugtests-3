@@ -1,0 +1,125 @@
+[
+  {
+    "_index": "packets-2019-03-08",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "eth1"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar  8, 2019 11:51:25.042173000 W. Europe Standard Time",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1552042285.042173000",
+          "frame.time_delta": "0.000000000",
+          "frame.time_delta_displayed": "0.000000000",
+          "frame.time_relative": "0.000000000",
+          "frame.number": "1",
+          "frame.len": "92",
+          "frame.cap_len": "92",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:lldp",
+          "frame.coloring_rule.name": "Broadcast",
+          "frame.coloring_rule.string": "eth[0] & 1"
+        },
+        "eth": {
+          "eth.dst": "01:80:c2:00:00:0e",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "LLDP_Multicast",
+            "eth.addr": "01:80:c2:00:00:0e",
+            "eth.addr_resolved": "LLDP_Multicast",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "00:55:24:07:15:3e",
+          "eth.src_tree": {
+            "eth.src_resolved": "00:55:24:07:15:3e",
+            "eth.addr": "00:55:24:07:15:3e",
+            "eth.addr_resolved": "00:55:24:07:15:3e",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x000088cc"
+        },
+        "lldp": {
+          "Chassis Subtype = MAC address, Id: 00:55:24:07:15:39": {
+            "lldp.tlv.type": "1",
+            "lldp.tlv.len": "7",
+            "lldp.chassis.subtype": "4",
+            "lldp.chassis.id.mac": "00:55:24:07:15:39"
+          },
+          "Port Subtype = Interface name, Id: gbe3": {
+            "lldp.tlv.type": "2",
+            "lldp.tlv.len": "5",
+            "lldp.port.subtype": "5",
+            "lldp.port.id": "gbe3"
+          },
+          "Time To Live = 121 sec": {
+            "lldp.tlv.type": "3",
+            "lldp.tlv.len": "2",
+            "lldp.time_to_live": "121"
+          },
+          "Port Description = User Gigabit Interface": {
+            "lldp.tlv.type": "4",
+            "lldp.tlv.len": "22",
+            "lldp.port.desc": "User Gigabit Interface"
+          },
+          "System Name = -": {
+            "lldp.tlv.type": "5",
+            "lldp.tlv.len": "1",
+            "lldp.tlv.system.name": "-"
+          },
+          "System Description = UL-FX80": {
+            "lldp.tlv.type": "6",
+            "lldp.tlv.len": "7",
+            "lldp.tlv.system.desc": "UL-FX80"
+          },
+          "Capabilities": {
+            "lldp.tlv.type": "7",
+            "lldp.tlv.len": "4",
+            "lldp.tlv.system_cap": "0x00000005",
+            "lldp.tlv.system_cap_tree": {
+              "lldp.tlv.system_cap.other": "1",
+              "lldp.tlv.system_cap.repeater": "0",
+              "lldp.tlv.system_cap.bridge": "1",
+              "lldp.tlv.system_cap.wlan_access_pt": "0",
+              "lldp.tlv.system_cap.router": "0",
+              "lldp.tlv.system_cap.telephone": "0",
+              "lldp.tlv.system_cap.docsis_cable_device": "0",
+              "lldp.tlv.system_cap.station_only": "0"
+            },
+            "lldp.tlv.enable_system_cap": "0x00000005",
+            "lldp.tlv.enable_system_cap_tree": {
+              "lldp.tlv.enable_system_cap.other": "1",
+              "lldp.tlv.enable_system_cap.repeater": "0",
+              "lldp.tlv.enable_system_cap.bridge": "1",
+              "lldp.tlv.enable_system_cap.wlan_access_pt": "0",
+              "lldp.tlv.enable_system_cap.router": "0",
+              "lldp.tlv.enable_system_cap.telephone": "0",
+              "lldp.tlv.enable_system_cap.docsis_cable_device": "0",
+              "lldp.tlv.enable_system_cap.station_only": "0"
+            }
+          },
+          "Management Address": {
+            "lldp.tlv.type": "8",
+            "lldp.tlv.len": "12",
+            "lldp.mgn.address.len": "5",
+            "lldp.mgn.address.subtype": "1",
+            "lldp.mgn.addr.ip4": "10.10.10.218",
+            "lldp.mgn.interface.subtype": "2",
+            "lldp.mgn.interface.number": "22",
+            "lldp.mgn.obj.len": "0"
+          },
+          "End of LLDPDU": {
+            "lldp.tlv.type": "0",
+            "lldp.tlv.len": "0"
+          }
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,182 @@
+{
+	"info": {
+		"_postman_id": "6de01a69-fa63-4460-b934-ec5929adc6bd",
+		"name": "TD_SSP_01_ICOM_LOCAL",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TD_SSP_01-Step-1-PUT",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8da7a764-3dff-43c9-8569-d0c9d074b316",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"",
+							"pm.environment.unset('TD_SDN_S1_LOCAL_ADMIN_STATUS');",
+							"pm.environment.unset('TD_SDN_S2_LOCAL_ADMIN_STATUS');",
+							"pm.environment.unset('TD_SDN_S3_LOCAL_ADMIN_STATUS');",
+							"",
+							"pm.test('Post status check', function() {",
+							"    pm.expect(pm.response).to.have.property('code', 201);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "fb7d86be-e805-4538-91eb-2475d4a1742a",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"pm.environment.unset('TD_SDN_MEDIA_TYPE');",
+							"pm.environment.unset('TD_SDN_SERVICE_NAME');",
+							"pm.environment.unset('TD_SDN_VLAN_ID');",
+							"pm.environment.unset('TD_SDN_ETH_PROVIDER_ID');",
+							"pm.environment.unset('TD_SDN_ETH_CLIENT_ID');",
+							"pm.environment.unset('TD_SDN_ETH_TOPOLOGY_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID1');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_ACCESS_TE_NODE_ID2');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ID');",
+							"pm.environment.unset('TD_SDN_NAMESPACE_PREFIX');",
+							"pm.environment.unset('TD_SDN_A_LINK_AGGR_1_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_A_LINK_LOCAL_11_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1E_TE_TP_ACCESS_ID');",
+							"pm.environment.unset('TD_SDN_I_D_LINK_1W_TE_TP_ACCESS_ID');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"",
+							"if (companyName !== 'Intracom') {",
+							"    throw new Error('This collection should only be run for Intracom Domain');",
+							"}",
+							"",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"if (!companySettings.svc) {",
+							"    throw new Error('Information about svc is not known. Please run '",
+							"            + '\"TD_SDN_SNSD_03-Step-1\"');",
+							"}",
+							"",
+							"var localServiceCurrentlyActivated = pm.environment.get('TD_SDN_ICOM_ACTIVE_LOCAL_SERVICE');",
+							"if (localServiceCurrentlyActivated === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_ICOM_ACTIVE_LOCAL_SERVICE\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"",
+							"var s1_local_admin = \"down\";",
+							"var s2_local_admin = \"down\";",
+							"var s3_local_admin = \"down\";",
+							"",
+							"if ('S1_local' === localServiceCurrentlyActivated) {",
+							"    // S1_local was active   -> Deactivate S1_local ",
+							"    // S2_local was inactive -> Activate   S2_local ",
+							"    // S3_local was inactive -> Still inactive   S3_local ",
+							"    s2_local_admin = \"up\";",
+							"    pm.environment.set('TD_SDN_ICOM_ACTIVE_LOCAL_SERVICE', 'S2_local');",
+							"} else if ('S2_local' === localServiceCurrentlyActivated) {",
+							"    // S2_local was active   -> Deactivate S2_local ",
+							"    // S3_local was inactive -> Activate   S3_local ",
+							"    // S1_local was inactive -> Still inactive   S1_local ",
+							"    s3_local_admin = \"up\";",
+							"    pm.environment.set('TD_SDN_ICOM_ACTIVE_LOCAL_SERVICE', 'S3_local');",
+							"}",
+							"",
+							"var mediaType = companySettings.hasOwnProperty('mediaTypeForPosts')",
+							"        ? companySettings.mediaTypeForPosts : 'application/yang-data+json';",
+							"",
+							"var namespacePrefix = !companySettings.noNamespaceOnPost ? 'ietf-eth-tran-service:' : '';",
+							"",
+							"",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							"pm.environment.set('TD_SDN_MEDIA_TYPE', mediaType);",
+							"pm.environment.set('TD_SDN_NAMESPACE_PREFIX', namespacePrefix);",
+							"",
+							"pm.environment.set('TD_SDN_S1_LOCAL_ADMIN_STATUS', s1_local_admin);",
+							"pm.environment.set('TD_SDN_S2_LOCAL_ADMIN_STATUS', s2_local_admin);",
+							"pm.environment.set('TD_SDN_S3_LOCAL_ADMIN_STATUS', s3_local_admin);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"{{TD_SDN_NAMESPACE_PREFIX}}etht-svc-instances\": \r\n    [\r\n        {\r\n            \"etht-svc-name\": \"S1_local\",\r\n            \"admin-status\": \"ietf-te-types:tunnel-state-{{TD_SDN_S1_LOCAL_ADMIN_STATUS}}\"\r\n        },\r\n        {\r\n            \"etht-svc-name\": \"S2_local\",\r\n            \"admin-status\": \"ietf-te-types:tunnel-state-{{TD_SDN_S2_LOCAL_ADMIN_STATUS}}\"\r\n        },\r\n        {\r\n            \"etht-svc-name\": \"S3_local\",\r\n            \"admin-status\": \"ietf-te-types:tunnel-state-{{TD_SDN_S3_LOCAL_ADMIN_STATUS}}\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc"
+					]
+				},
+				"description": "It sends a POST request in order to create the actual service. This step (as Step-2) will be executed only if it is supporded. Otherwise Step-1 will continue with Step-4. After the execution of this step, Step-4 will be skipped, and we will continue with Step-5."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "9fe3949f-d9e5-4875-8f2f-ad3bdc8e5e5e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "71a7d21e-625e-4f6e-8413-ef0412d13280",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -1,0 +1,132 @@
+{
+	"info": {
+		"_postman_id": "614600d9-787b-4ca9-8e62-857ef09937d2",
+		"name": "TD_SSP_04",
+		"description": "Interoperability Test Description\r\nIdentifier\tTD_ SDN_SSP_02\r\nTest Objective\tThe service topology information is requested from the single DC under test in TD_SDN_SSP_01. The received information is checked to correctly list the newly created service.\r\nConfiguration\tCFG_03\r\nReferences\t\r\nApplicability\tMW_8040, MW_8345, MW_TETOPO, MW_MWTOPO, MW_ETHSVC\r\n\r\nPre-test conditions\t•\tThe Domain Controller instance is up and running normally\r\n•\tAll the devices are upgraded to correct versions\r\n•\tAll basic configurations are completed (e.g., NE_id, OSPF, PCEP, etc.) \r\n•\tThe Restconf server is serviceable.\r\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TD_SSP_04-Step-1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "27d06c73-3416-431a-ab9c-51bf59c2b2f8",
+						"exec": [
+							"// clean environment variables",
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"var companySettings = settings.companies[companyName];",
+							"",
+							"// Step-1, validation: The response body should contain information about the created L2 service in JSON format referring to Annex D.3",
+							"pm.test('Response is OK', function() {",
+							"    if(companySettings.deletesEmptyContainer) {",
+							"        pm.expect(pm.response).to.have.property('code',404);",
+							"    }",
+							"    else {",
+							"       pm.expect(pm.response).to.have.property('code',200);",
+							"    }",
+							"});",
+							"",
+							"if(!companySettings.deletesEmptyContainer) {",
+							"",
+							"    var responseJson = pm.response.json();",
+							"    var serviceName = settings.servicename;",
+							"    ",
+							"    (function() {",
+							"        var topLevelPropertyName = responseJson.hasOwnProperty('etht-svc')",
+							"                ? 'etht-svc' : 'ietf-eth-tran-service:etht-svc';",
+							"        var topLevelObject = null;",
+							"        pm.test('validate Response Body', function() {",
+							"            pm.expect(responseJson).to.have.property(topLevelPropertyName);",
+							"            topLevelObject = responseJson[topLevelPropertyName];",
+							"        });",
+							"        ",
+							"        var service = null;",
+							"        var serviceNames = [\"S1_local\", \"S2_local\", \"S3_local\", \"S1-inter-d\", \"S2-inter-d\", \"S1-leaf2\", \"S2-leaf2\"];",
+							"        ",
+							"        if (topLevelObject.hasOwnProperty(['etht-svc-instances'])) {",
+							"            pm.test('Validate Response Body for \"etht-svc-instances\" array', function() {",
+							"                var instanceArr = topLevelObject['etht-svc-instances'];",
+							"                pm.expect(Array.isArray(instanceArr)).be.true;",
+							"                for(var i = 0; i < serviceNames.length; i++) {",
+							"                    serviceName = serviceNames[i];",
+							"                    service = findOurService(instanceArr, serviceName);",
+							"                    checkNonExistenceOfService(service, serviceName);",
+							"                }",
+							"            });",
+							"        }",
+							"    }());",
+							"}",
+							"",
+							"function findOurService(instanceArr, serviceName) {",
+							"    var len = instanceArr.length;",
+							"    for (var i = 0; i < len; ++i) {",
+							"        var svc = instanceArr[i];",
+							"        if (svc['etht-svc-name'] === serviceName) {",
+							"            return svc;",
+							"        }",
+							"    }",
+							"    return null;",
+							"}",
+							"",
+							"function checkNonExistenceOfService(service, serviceName) {",
+							"    pm.test('Service non existence check: ' + serviceName, function(){",
+							"        pm.expect(service === null).to.be.true;",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d8db2f60-2f1c-44a0-9780-ce327e9a1a09",
+						"exec": [
+							"pm.environment.unset('TD_SDN_RESTCONF_PATH');",
+							"",
+							"var settings = pm.environment.get('TD_SDN_SETTINGS');",
+							"if (settings === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_SETTINGS\" is undefined. '",
+							"            + 'Please run \"Setup\" Request of \"TD_SDN_INIT\" collection.');",
+							"}",
+							"var companyName = pm.environment.get('TD_SDN_COMPANY');",
+							"if (companyName === undefined) {",
+							"    throw new Error('Environment variable \"TD_SDN_COMPANY\" is undefined. '",
+							"            + 'Please define it in your environment');",
+							"}",
+							"var companySettings = settings.companies[companyName];",
+							"if (companySettings === undefined) {",
+							"    throw new Error('Unknown company \"' + companyName + '\"');",
+							"}",
+							"",
+							"pm.environment.set('TD_SDN_RESTCONF_PATH', companySettings.restconfPath);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{TD_SDN_RESTCONF_PATH}}/data/ietf-eth-tran-service:etht-svc",
+					"host": [
+						"{{TD_SDN_RESTCONF_PATH}}"
+					],
+					"path": [
+						"data",
+						"ietf-eth-tran-service:etht-svc"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
